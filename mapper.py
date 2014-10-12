@@ -1,8 +1,5 @@
 import sys
 import os
-import struct
-import math
-import cStringIO
 import json
 from PIL import Image, ImageDraw
 from MCMap import MCMap
