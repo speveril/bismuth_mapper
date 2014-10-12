@@ -5,7 +5,8 @@ import math
 import cStringIO
 import json
 from PIL import Image, ImageDraw
-from MCMap import MCMap, AnvilRegion
+from MCMap import MCMap
+from AnvilRegion import AnvilRegion
 
 def get_nibble(data, index):
     byte = data[index >> 1]
