@@ -163,35 +163,10 @@ for map in maps:
                         combined_colors[(x + col + cx * scale) + (z + row + cz * scale) * combined_width] = map.colors[cx + cz * map.width]
                         # TODO write True into a region look up for "are there pixels here"
 
-pixels = ""
-line = ""
-for i in range(0, len(combined_colors)):
-    if (combined_colors[i] < 4):
-        line = line + "\x00\x00\x00\x00"
-    else:
-        line = line + "\xff\xff\xff\xff"
-    #line = line + color_map[combined_colors[i]]
-    if len(line) >= combined_width * 4:
-        pixels = pixels + line
-        line = ""
-im = Image.frombuffer("RGBA", (combined_width,combined_height), pixels, "raw", "RGBA", 0, 1)
-#im.save(output_path + "/stitched.png")
-
-
 path = sys.argv[1] + "/region/"
 file_list = os.listdir(path)
 
 print str(len(file_list)) + " regions to check."
-
-full_trans = Image.new('L', im.size, color=0)
-
-over_icons = Image.new("RGBA", im.size)
-over_icons.putalpha(full_trans)
-over_labels = Image.new("RGBA", im.size)
-over_labels.putalpha(full_trans)
-
-draw_icons = ImageDraw.ImageDraw(over_icons)
-draw_labels = ImageDraw.ImageDraw(over_labels)
 
 worldOffset = (min_x, min_z)
 
@@ -230,7 +205,7 @@ for f in file_list:
     markers[f] = []
     region = AnvilRegion(path + f)
 
-    sys.stdout.write(" " + str(len(region.chunks)) + " chunks loaded.");
+    sys.stdout.write(" " + str(len(region.chunks)) + " chunks loaded");
     sys.stdout.flush()
 
     tile_im = Image.new("RGBA", (512,512), color=(0,0,0,0))
@@ -240,7 +215,7 @@ for f in file_list:
 
     for ch in region.chunks:
         counter = counter + 1
-        if (counter - 1) % 64 == 0:
+        if counter % 64 == 0:
             sys.stdout.write(".")
             sys.stdout.flush()
 
@@ -404,8 +379,6 @@ for f in file_list:
 
     sys.stdout.write("\n")
 
-#over_icons.save(output_path + "/icons.png")
-#over_labels.save(output_path + "/labels.png")
 f = open(output_path + "/markers.json", "w")
 json.dump(markers, f)
 sys.stdout.write("Wrote markers.json\n")
