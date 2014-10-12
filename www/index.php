@@ -120,7 +120,8 @@
                 $y = $marker->z - ($top * 512);
                 print '<div class="marker '.$marker->type.'" style="top: '.$y.'px; left: '.$x.'px;"></div>';
                 if ($marker->label) {
-                    print '<div class="label" style="top: '.$y.'px; left: '.$x.'px;">'.$marker->label.'</div>';
+                    $label = str_replace('\\u0027', "'", $marker->label);
+                    print '<div class="label" style="top: '.$y.'px; left: '.$x.'px;">'.$label.'</div>';
                 }
             }
         }
@@ -139,68 +140,65 @@
             <input type="checkbox" id="overlay_icons_toggle" checked="checked" onChange="renderLayers();"> Icons<br>
             <input type="checkbox" id="overlay_labels_toggle" checked="checked" onChange="renderLayers();"> Labels<br>
         </p>
-        <!--<p>
-        <strong>Other Maps</strong><br>
-        <a href="bismuth-transit-map.png">Transit Map</a>
-    </p>-->
-    <p>
-        <strong>Sign Formats for Markers</strong>
-        <table>
-            <tr>
-                <td class="sign"><em>&lt;icon text&gt;</em><br>The rest<br>is for<br>the label</td>
-            </tr>
-        </table>
-    </p>
-    <p>
-        <strong>Available icons</strong>
-        <table>
-            <tr>
-                <td width="20%">x</td>
-                <td width="10%">&rarr;</td>
-                <td width="20%"><div class="marker x"></div></td>
+        <p>
+            <strong>Sign Formats for Markers</strong>
+            <table>
+                <tr>
+                    <td class="sign"><em>&lt;icon text&gt;</em><br>The rest<br>is for<br>the label</td>
+                </tr>
+            </table>
+        </p>
+        <p>
+            <strong>Available icons</strong>
+            <table>
+                <tr>
+                    <td width="20%">x</td>
+                    <td width="10%">&rarr;</td>
+                    <td width="20%"><div class="marker x"></div></td>
 
-                <td width="20%">(*)</td>
-                <td width="10%">&rarr;</td>
-                <td width="20%"><div class="marker circle"></div></td>
-            </tr>
-            <tr>
-                <td>[*]</td>
-                <td>&rarr;</td>
-                <td><div class="marker square"></div></td>
+                    <td width="20%">(*)</td>
+                    <td width="10%">&rarr;</td>
+                    <td width="20%"><div class="marker circle"></div></td>
+                </tr>
+                <tr>
+                    <td>[*]</td>
+                    <td>&rarr;</td>
+                    <td><div class="marker square"></div></td>
 
-                <td>((*))</td>
-                <td>&rarr;</td>
-                <td><div class="marker big_circle"></div></td>
-            </tr>
-            <tr>
-                <td>(K)</td>
-                <td>&rarr;</td>
-                <td><div class="marker keep"></div></td>
+                    <td>((*))</td>
+                    <td>&rarr;</td>
+                    <td><div class="marker big_circle"></div></td>
+                </tr>
+                <tr>
+                    <td>(K)</td>
+                    <td>&rarr;</td>
+                    <td><div class="marker keep"></div></td>
 
-                <td>(T)</td>
-                <td>&rarr;</td>
-                <td><div class="marker tower"></div></td>
-            </tr>
-            <tr>
-                <td>(F)</td>
-                <td>&rarr;</td>
-                <td><div class="marker farm"></div></td>
+                    <td>(T)</td>
+                    <td>&rarr;</td>
+                    <td><div class="marker tower"></div></td>
+                </tr>
+                <tr>
+                    <td>(F)</td>
+                    <td>&rarr;</td>
+                    <td><div class="marker farm"></div></td>
 
-                <td>(M)</td>
-                <td>&rarr;</td>
-                <td><div class="marker mine"></div></td>
-            </tr>
-            <tr>
-                <td>^^</td>
-                <td>&rarr;</td>
-                <td><div class="marker portal"></div></td>
+                    <td>(M)</td>
+                    <td>&rarr;</td>
+                    <td><div class="marker mine"></div></td>
+                </tr>
+                <tr>
+                    <td>^^</td>
+                    <td>&rarr;</td>
+                    <td><div class="marker portal"></div></td>
 
-                <td>(R)</td>
-                <td>&rarr;</td>
-                <td><div class="marker ruins"></div></td>
-            </tr>
-        </table>
-    </p>
+                    <td>(R)</td>
+                    <td>&rarr;</td>
+                    <td><div class="marker ruins"></div></td>
+                </tr>
+            </table>
+        </p>
+    </div>
 </div>
 
 <script type="text/javascript">
