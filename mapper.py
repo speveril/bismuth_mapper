@@ -5,11 +5,6 @@ from PIL import Image, ImageDraw
 from MCMap import MCMap
 from AnvilRegion import AnvilRegion
 
-actual_colors = []
-dark_colors = []
-bright_colors = []
-block_colors = []
-
 def get_nibble(data, index):
     byte = data[index >> 1]
     #out "nibble(", index, byte, (index % 2), ")",
@@ -58,7 +53,9 @@ def get_maps(path):
     return (min_x, min_z, max_x, max_z, maps)
 
 def make_colors():
-    actual_colors = [
+    colors = {}
+
+    colors['actual'] = [
         (255,255,255), #transparent
         (127,178,56), #grass green
         (247,233,163), #sand,gravel
@@ -95,17 +92,17 @@ def make_colors():
         ( 32, 32,196), # deep water
     ]
 
-    dark_colors = []
-    bright_colors = []
+    colors['dark'] = []
+    colors['bright'] = []
 
-    for c in actual_colors:
+    for c in colors['actual']:
         d = (int(c[0] * 0.75), int(c[1] * 0.75), int(c[2] * 0.75))
-        dark_colors.append(d)
+        colors['dark'].append(d)
         b = (min(255,int(c[0] * 1.2)), min(255,int(c[1] * 1.2)), min(255, int(c[2] * 1.2)))
-        bright_colors.append(b)
+        colors['bright'].append(b)
 
     # based on table at http://www.minecraftwiki.net/wiki/Block_ids
-    block_colors = [
+    colors['block'] = [
          0,11, 1,10,11,13, 7,11,12,12, 4, 4, 2, 2,11,11, # 0-15
         11,13, 7, 3, 0,11,12,11,11,13, 3, 0, 0,11, 3, 7, # 16-31
          7,11,11, 3,11, 7, 7, 7, 7, 6, 6,11,11,11, 4,13, # 32-47
@@ -124,14 +121,14 @@ def make_colors():
          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, # 240-255
     ]
 
-    wool_colors = [
+    colors['tints'] = [
         15,16,17,18, 19,20,21,22, 23,24,25,26, 27,28,29,30
     ]
-    water_colors = [ 12, 31 ]
-
+    colors['water'] = [ 12, 31 ]
+    return colors
 
 def build(world_path, output_path):
-    make_colors()
+    colors = make_colors()
 
     (min_x, min_z, max_x, max_z, maps) = get_maps(world_path + "/data/")
     if len(maps) < 1:
@@ -143,6 +140,7 @@ def build(world_path, output_path):
     out("Combined map: %d x %d (%d,%d)-(%d,%d)\n" % (combined_width,combined_height,min_x,min_z,max_x,max_z))
 
     map_data = [0] * (combined_width * combined_height)
+    regions_with_data = []
 
     for map in maps:
         scale = 2 ** map.scale
@@ -155,8 +153,11 @@ def build(world_path, output_path):
                 if c > 3:
                     for row in range(0,scale):
                         for col in range(0,scale):
-                            map_data[(x + col + cx * scale) + (z + row + cz * scale) * combined_width] = 1 #map.colors[cx + cz * map.width]
+                            block_x = x + col + cx * scale
+                            block_z = z + col + cz * scale
+                            map_data[block_x + block_z * combined_width] = 1 #map.colors[cx + cz * map.width]
                             # TODO write True into a region look up for "are there pixels here"
+
         out(".")
 
     path = world_path + "/region/"
@@ -177,6 +178,7 @@ def build(world_path, output_path):
     # assumes at most 10000 regions square; that's an area of roughly 5120 km to a side so
     # it's probably okay for most worlds
     region_files.sort(key=lambda x: int(x.split(".")[1]) + float(x.split(".")[2]) / 10000)
+    out("Region files sorted.\n")
 
     for f in region_files:
         out("  " + f + ": ")
@@ -250,15 +252,15 @@ def build(world_path, output_path):
                                         else:
                                             if water_depth > 0:
                                                 if water_depth < 12 or (water_depth < 24 and (mapX + mapY) % 2):
-                                                    cl = water_colors[0]
+                                                    cl = colors['water'][0]
                                                 else:
-                                                    cl = water_colors[1]
+                                                    cl = colors['water'][1]
                                                 water_depth = 0
                                             elif bl == 35 or bl == 159 or bl == 172: # coloured blocks
                                                 dataValue = get_nibble(sections[sect]['Data'].value, blockIndex)
-                                                cl = wool_colors[dataValue]
+                                                cl = colors['tints'][dataValue]
                                             else:
-                                                cl = block_colors[bl]
+                                                cl = colors['block'][bl]
 
                                         if not bl:
                                             light = 0.50 + (get_nibble(sections[sect]['BlockLight'].value, blockIndex) * 0.034)
@@ -270,12 +272,12 @@ def build(world_path, output_path):
                                     if h == 0 and cl == 0:
                                         out("!!" + str(x) + "," + str(z) + "!!")
 
-                                color = actual_colors[cl]
+                                color = colors['actual'][cl]
 
                                 if tileZ > 0 and heights[tileX * 512 + (tileZ - 1)] and heights[tileX * 512 + (tileZ - 1)] > h:
-                                    color = dark_colors[cl]
+                                    color = colors['dark'][cl]
                                 elif tileZ > 0 and heights[tileX * 512 + (tileZ - 1)] and heights[tileX * 512 + (tileZ - 1)] < h:
-                                    color = bright_colors[cl]
+                                    color = colors['bright'][cl]
 
                                 tile_im.putpixel((tileX, tileZ), (int(color[0] * light), int(color[1] * light), int(color[2] * light)))
 
