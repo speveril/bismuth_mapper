@@ -1,0 +1,167 @@
+<html>
+    <head>
+        <title>BISMUTH MINECRAFT</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="mapper.css">
+    </head>
+
+    <body>
+        <div class="load-helper"></div>
+        <canvas id="map-surface"></canvas>
+        <canvas id="overlay-surface"></canvas>
+        <div class="input-catcher"></div>
+    </body>
+
+<script>
+
+var tiles, markers;
+var things_loaded = 0;
+var things_to_load = 0;
+
+var camera = [0,0,1];
+
+function loadTiles() {
+    var $loadHelper = $('.load-helper');
+
+    for (var i = 0; i < tiles.length; i++) {
+        var $img = $('<img>');
+        $img.attr('src', tiles[i].src);
+        $loadHelper.append($img);
+        tiles[i].img = $img[0];
+
+        things_to_load++;
+        $img.on('error load', function() { things_loaded++; });
+    }
+}
+
+function resizeCanvases() {
+    $('canvas')
+        .attr('width', $(window).width())
+        .attr('height', $(window).height())
+    ;
+    redrawMap();
+}
+
+function redrawMap() {
+    var $mapCanvas = $('#map-surface');
+    var ctx = $mapCanvas[0].getContext("2d");
+    ctx.imageSmoothingEnabled = false;
+    ctx.mozImageSmoothingEnabled = false;
+    ctx.oImageSmoothingEnabled = false;
+    ctx.webkitImageSmoothingEnabled = false;
+
+    var w = $mapCanvas.attr('width');
+    var h = $mapCanvas.attr('height');
+
+    ctx.fillRect(0, 0, w, h);
+
+    for (var i = 0; i < tiles.length; i++) {
+        var x = (tiles[i].x - camera[0]) * camera[2];
+        var y = (tiles[i].y - camera[1]) * camera[2];
+        var sz = 512 * camera[2];
+
+        if (x + sz >= 0 && x < w && y + sz >= 0 && y < h) {
+            ctx.drawImage(tiles[i].img, x, y, sz, sz);
+        }
+    }
+
+    document.cookie = JSON.stringify(camera);
+}
+
+function waitForLoad(cb) {
+    if (things_loaded >= things_to_load) {
+        cb();
+    } else {
+        setTimeout(waitForLoad.bind(this, cb), 25);
+    }
+}
+
+function setupInput() {
+    var dragging = false;
+    var lastMousePos = [];
+    var zoomSpeed = 0.5;
+
+    $('.input-catcher').on('mousedown', function(evt) {
+        dragging = true;
+        $('.input-catcher').addClass('dragging');
+    });
+    $('.input-catcher').on('mouseup', function(evt) {
+        dragging = false;
+        $('.input-catcher').removeClass('dragging');
+    });
+    $('.input-catcher').on('mousemove', function(evt) {
+        if (dragging) {
+            var dx = evt.pageX - lastMousePos[0];
+            var dy = evt.pageY - lastMousePos[1];
+            camera[0] -= dx / camera[2];
+            camera[1] -= dy / camera[2];
+            redrawMap();
+
+        }
+        lastMousePos = [evt.pageX, evt.pageY];
+    });
+    $('.input-catcher').on('mousewheel', function(evt) {
+        var wX = camera[0] + lastMousePos[0] / camera[2];
+        var wY = camera[1] + lastMousePos[1] / camera[2];
+
+        if (evt.originalEvent.wheelDelta > 0 && camera[2] < 16) {
+            camera[2] /= zoomSpeed;
+        } else if (evt.originalEvent.wheelDelta < 0 && camera[2] > 0.1) {
+            camera[2] *= zoomSpeed;
+        }
+
+        camera[0] = wX - lastMousePos[0] / camera[2];
+        camera[1] = wY - lastMousePos[1] / camera[2];
+        redrawMap();
+    });
+}
+
+// --- loading stuff ---
+
+function loadingError(xhr, type, error) {
+    console.log("Loading error:", type, error);
+}
+
+function startLoading() {
+    $.ajax({dataType:'json', url:'tile/tiles.json', success: loadedTileJSON, error: loadingError});
+}
+
+function loadedTileJSON(data) {
+    tiles = [];
+    for (k in data) {
+        if (data.hasOwnProperty(k)) {
+            tiles.push(data[k]);
+        }
+    }
+    loadTiles();
+    $.ajax({dataType:'json', url:'tile/markers.json', success: loadedMarkerJSON, error: loadingError});
+}
+
+function loadedMarkerJSON(data) {
+    markers = data;
+    waitForLoad(loadedTiles);
+}
+
+function loadedTiles() {
+    if (document.cookie) {
+        camera = JSON.parse(document.cookie);
+    }
+
+    if (!document.cookie || camera.length != 3 || camera[2] < 0.1 || camera[2] > 16) {
+        camera = [-$('canvas').width() / 2, -$('canvas').height() / 2, 1];
+    }
+
+    setupInput();
+
+    $(window).on('resize',resizeCanvases);
+    resizeCanvases();
+}
+
+
+// DO IT
+$(startLoading);
+// OKAY YOU DID IT
+
+</script>
+
+</html>

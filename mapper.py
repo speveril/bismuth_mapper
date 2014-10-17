@@ -159,6 +159,7 @@ def build(world_path, output_path):
                             # TODO write True into a region look up for "are there pixels here"
 
         out(".")
+    out("\n")
 
     path = world_path + "/region/"
     region_files = os.listdir(path)
@@ -166,9 +167,15 @@ def build(world_path, output_path):
 
     worldOffset = (min_x, min_z)
 
-    # TODO check if file exists and create it if not
-    jsondata = open(output_path + '/markers.json')
-    markers = json.load(jsondata)
+    if os.path.exists(output_path + '/markers.json'):
+        markers = json.load(open(output_path + '/markers.json'))
+    else:
+        markers = {}
+
+    if os.path.exists(output_path + '/tiles.json'):
+        tiles = json.load(open(output_path + '/tiles.json'))
+    else:
+        tiles = {}
 
     # TODO start using a hints.json which stores whatever; specifically I can start
     # storing the southern edge of height maps so I can calculate the shading
@@ -186,7 +193,8 @@ def build(world_path, output_path):
         f_parts = f.split(".")
         tx = f_parts[1]
         ty = f_parts[2]
-        output_f = output_path + "/tile." + tx + "." + ty + ".png"
+        output_f = output_path + "tile." + tx + "." + ty + ".png"
+        tiles[f] = { 'src':"tile/tile." + tx + "." + ty + ".png", 'x':int(tx)*512, 'y':int(ty)*512 }
 
         if int(tx) * 512 > max_x or int(ty) * 512 > max_z or (int(tx) + 1) * 512 < min_x or (int(ty) + 1) * 512 < min_z:
             out(" Region is entirely outside of mapped area. Skipping.\n")
@@ -375,6 +383,9 @@ def build(world_path, output_path):
     json.dump(markers, f)
     out("Wrote markers.json\n")
 
+    f = open(output_path + "/tiles.json", "w")
+    json.dump(tiles, f)
+    out("Wrote tiles.json\n")
 
 if __name__ == "__main__":
     build(sys.argv[1], sys.argv[2])
