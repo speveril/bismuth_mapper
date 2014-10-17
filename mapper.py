@@ -153,9 +153,9 @@ def build(world_path, output_path):
                 if c > 3:
                     for row in range(0,scale):
                         for col in range(0,scale):
-                            block_x = x + col + cx * scale
-                            block_z = z + col + cz * scale
-                            map_data[block_x + block_z * combined_width] = 1 #map.colors[cx + cz * map.width]
+                            block_x = x + cx * scale + col
+                            block_z = z + cz * scale + row
+                            map_data[block_x + block_z * combined_width] = 1
                             # TODO write True into a region look up for "are there pixels here"
 
         out(".")

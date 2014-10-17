@@ -20,7 +20,7 @@ var things_to_load = 0;
 
 var camera = [0,0,1];
 
-function loadTiles() {
+function loadImages() {
     var $loadHelper = $('.load-helper');
 
     for (var i = 0; i < tiles.length; i++) {
@@ -50,10 +50,18 @@ function redrawMap() {
     ctx.oImageSmoothingEnabled = false;
     ctx.webkitImageSmoothingEnabled = false;
 
+    var $mapCanvas = $('#overlay-surface');
+    var ctxO = $mapCanvas[0].getContext("2d");
+    ctxO.imageSmoothingEnabled = false;
+    ctxO.mozImageSmoothingEnabled = false;
+    ctxO.oImageSmoothingEnabled = false;
+    ctxO.webkitImageSmoothingEnabled = false;
+
     var w = $mapCanvas.attr('width');
     var h = $mapCanvas.attr('height');
 
     ctx.fillRect(0, 0, w, h);
+    ctxO.clearRect(0, 0, w, h);
 
     for (var i = 0; i < tiles.length; i++) {
         var x = (tiles[i].x - camera[0]) * camera[2];
@@ -133,16 +141,16 @@ function loadedTileJSON(data) {
             tiles.push(data[k]);
         }
     }
-    loadTiles();
+    loadImages();
     $.ajax({dataType:'json', url:'tile/markers.json', success: loadedMarkerJSON, error: loadingError});
 }
 
 function loadedMarkerJSON(data) {
     markers = data;
-    waitForLoad(loadedTiles);
+    waitForLoad(loadedImages);
 }
 
-function loadedTiles() {
+function loadedImages() {
     if (document.cookie) {
         camera = JSON.parse(document.cookie);
     }
