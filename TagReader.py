@@ -48,13 +48,13 @@ class Tag:
         if self.type == 0:
             return
 
-        elif self.is_type(['TAG_Byte','TAG_Short','TAG_Int','TAG_Long','TAG_Float','TAG_Double','TAG_String']):
+        elif self.type == Tag_Type['TAG_Byte'] or self.type == Tag_Type['TAG_Short'] or self.type == Tag_Type['TAG_Int'] or self.type == Tag_Type['TAG_Long'] or self.type == Tag_Type['TAG_Float'] or self.type == Tag_Type['TAG_Double'] or self.type == Tag_Type['TAG_String']:
             print (" " * indent) + "[" + Tag_Type_Name[self.type] + "] " + str(self.name) + ": " + str(self.value)
 
-        elif self.is_type(['TAG_List','TAG_Byte_Array','TAG_Int_Array']):
+        elif self.type == Tag_Type['TAG_List'] or self.type == Tag_Type['TAG_Byte_Array'] or self.type == Tag_Type['TAG_Int_Array']:
             print (" " * indent) + "[" + Tag_Type_Name[self.type] + "] " + str(self.name) + ": " + str(self.value)
 
-        elif self.is_type('TAG_Compound'):
+        elif self.type == Tag_Type['TAG_Compound']:
             print (" " * indent) + "[" + Tag_Type_Name[self.type] + "] " + str(self.name) + ": "
             for t in self.value:
                 self[t].pretty_print(indent=indent + 2)
@@ -85,7 +85,7 @@ class TagReader:
             value = {}
             while True:
                 subtag = self.readTag()
-                if subtag.is_type('TAG_End'):
+                if subtag.type == Tag_Type['TAG_End']:
                     break
                 value[subtag.name] = subtag
 

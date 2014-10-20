@@ -4,19 +4,8 @@ import json
 from PIL import Image, ImageDraw
 from MCMap import MCMap
 from AnvilRegion import AnvilRegion
-
-def get_nibble(data, index):
-    byte = data[index >> 1]
-    #out "nibble(", index, byte, (index % 2), ")",
-    if index % 2 == 0:
-        return byte & 15
-    else:
-        return (byte & 240) >> 4
-
-def out(str):
-    sys.stdout.write(str)
-    sys.stdout.flush()
-
+from TileGenerator import TileGenerator
+from output import out
 
 def get_maps(path):
     min_x = None
@@ -128,8 +117,6 @@ def make_colors():
     return colors
 
 def build(world_path, output_path):
-    colors = make_colors()
-
     (min_x, min_z, max_x, max_z, maps) = get_maps(world_path + "/data/")
     if len(maps) < 1:
         out("No maps to build from.\n")
@@ -165,17 +152,19 @@ def build(world_path, output_path):
     region_files = os.listdir(path)
     out(str(len(region_files)) + " regions to check.\n")
 
-    worldOffset = (min_x, min_z)
-
-    if os.path.exists(output_path + '/markers.json'):
-        markers = json.load(open(output_path + '/markers.json'))
+    if os.path.exists(output_path + '/tile/markers.json'):
+        markers = json.load(open(output_path + '/tile/markers.json'))
+        out("Loaded markers.json")
     else:
         markers = {}
+        out("Creating markers.json")
 
-    if os.path.exists(output_path + '/tiles.json'):
-        tiles = json.load(open(output_path + '/tiles.json'))
+    if os.path.exists(output_path + '/tile/tiles.json'):
+        tiles = json.load(open(output_path + '/tile/tiles.json'))
+        out("Loaded tiles.json")
     else:
         tiles = {}
+        out("Creating tiles.json")
 
     # TODO start using a hints.json which stores whatever; specifically I can start
     # storing the southern edge of height maps so I can calculate the shading
@@ -184,8 +173,11 @@ def build(world_path, output_path):
 
     # assumes at most 10000 regions square; that's an area of roughly 5120 km to a side so
     # it's probably okay for most worlds
+    # TODO this sorting actually doesn't really work; it reverses negative y
     region_files.sort(key=lambda x: int(x.split(".")[1]) + float(x.split(".")[2]) / 10000)
     out("Region files sorted.\n")
+
+    tile_generator = TileGenerator(map_data, make_colors(), min_x, min_z, max_x, max_z)
 
     for f in region_files:
         out("  " + f + ": ")
@@ -193,7 +185,7 @@ def build(world_path, output_path):
         f_parts = f.split(".")
         tx = f_parts[1]
         ty = f_parts[2]
-        output_f = output_path + "tile." + tx + "." + ty + ".png"
+        output_f = output_path + "/tile/tile." + tx + "." + ty + ".png"
         tiles[f] = { 'src':"tile/tile." + tx + "." + ty + ".png", 'x':int(tx)*512, 'y':int(ty)*512 }
 
         if int(tx) * 512 > max_x or int(ty) * 512 > max_z or (int(tx) + 1) * 512 < min_x or (int(ty) + 1) * 512 < min_z:
@@ -204,186 +196,22 @@ def build(world_path, output_path):
             out(" Tile exists and is newer than the region file. Skipping.\n")
             continue
 
-        markers[f] = []
         region = AnvilRegion(path + f)
 
         out(" " + str(len(region.chunks)) + " chunks loaded");
 
-        tile_im = Image.new("RGBA", (512,512), color=(0,0,0,0))
+        (tile_im, m) = tile_generator.makeTile(region)
 
-        counter = 0
-        heights = [None] * (16 * 16 * 32 * 32)
-
-        for ch in region.chunks:
-            counter = counter + 1
-            if counter % 64 == 0:
-                out(".")
-
-            if ch[1] and isinstance(ch[1].value, dict) and ch[1].value and 'Level' in ch[1].value:
-                data = ch[1]['Level']
-
-                worldX = data['xPos'].value * 16
-                worldZ = data['zPos'].value * 16
-
-                if 'Sections' in data.value and 'HeightMap' in data.value:
-                    sections = []
-
-                    for s in range(16):
-                        sections.append(None)
-                    for s in data['Sections'].value:
-                        sections[s['Y'].value] = s
-                    for x in range(16):
-                        for z in range(16):
-                            mapX = worldX + x - worldOffset[0]
-                            mapY = worldZ + z - worldOffset[1]
-                            tileX = (worldX % 512) + x
-                            tileZ = (worldZ % 512) + z
-
-                            if mapX >= 0 and mapX < combined_width and mapY >= 0 and mapY < combined_height and map_data[mapX + (mapY * combined_width)] != 0:
-                                h = 256 # TODO replace with heightmap look up?
-                                cl = 0
-                                water_depth = 0
-                                while (cl == 0 or water_depth > 0) and h >= 0:
-                                    h = h - 1
-                                    sect = int(h/16)
-                                    if sections[sect]:
-                                        blockIndex = x + z * 16 + (h % 16) * 256
-
-                                        bl = sections[sect]['Blocks'].value[blockIndex]
-
-                                        if sections[sect]['Add'] != None:
-                                            addValue = get_nibble(sections[sect]['Add'].value, blockIndex)
-                                            bl = bl + (addValue << 8)
-
-                                        if bl == 8 or bl == 9: # water handling
-                                            water_depth += 1
-                                        else:
-                                            if water_depth > 0:
-                                                if water_depth < 12 or (water_depth < 24 and (mapX + mapY) % 2):
-                                                    cl = colors['water'][0]
-                                                else:
-                                                    cl = colors['water'][1]
-                                                water_depth = 0
-                                            elif bl == 35 or bl == 159 or bl == 172: # coloured blocks
-                                                dataValue = get_nibble(sections[sect]['Data'].value, blockIndex)
-                                                cl = colors['tints'][dataValue]
-                                            else:
-                                                cl = colors['block'][bl]
-
-                                        if not bl:
-                                            light = 0.50 + (get_nibble(sections[sect]['BlockLight'].value, blockIndex) * 0.034)
-
-                                        if bl in [31,32,37,38,39,40,78]:
-                                            h = h - 1
-                                        heights[tileX * 512 + tileZ] = h
-
-                                    if h == 0 and cl == 0:
-                                        out("!!" + str(x) + "," + str(z) + "!!")
-
-                                color = colors['actual'][cl]
-
-                                if tileZ > 0 and heights[tileX * 512 + (tileZ - 1)] and heights[tileX * 512 + (tileZ - 1)] > h:
-                                    color = colors['dark'][cl]
-                                elif tileZ > 0 and heights[tileX * 512 + (tileZ - 1)] and heights[tileX * 512 + (tileZ - 1)] < h:
-                                    color = colors['bright'][cl]
-
-                                tile_im.putpixel((tileX, tileZ), (int(color[0] * light), int(color[1] * light), int(color[2] * light)))
-
-                if 'TileEntities' in data.value and len(data['TileEntities'].value) > 0:
-                    for e in data['TileEntities'].value:
-                        if e['id'].value == 'Sign':
-                            x = e["x"].value - min_x
-                            z = e["z"].value - min_z
-
-                            # strip the " characters off the beginning and end of the string
-                            text1 = e["Text1"].value[1:-1]
-                            text2 = e["Text2"].value[1:-1]
-                            text3 = e["Text3"].value[1:-1]
-                            text4 = e["Text4"].value[1:-1]
-
-                            if x > 0 and x < combined_width - 1 and z > 0 and z < combined_height - 1:
-                                if text1 == 'X' or text1 == "x" or text1 == "(X)" or text1 == "(x)":
-                                    label = text2
-                                    if text3 != "":
-                                        label = label + " " + text3
-                                    if text4 != "" and text4 != text1:
-                                        label = label + " " + text4
-                                    markers[f].append({"x": e["x"].value, "z": e["z"].value, "type": "x", "label": label })
-                                elif text1 == '^^':
-                                    label = text2
-                                    if text3 != "":
-                                        label = label + " " + text3
-                                    if text4 != "" and text4 != text1:
-                                        label = label + " " + text4
-                                    markers[f].append({"x": e["x"].value, "z": e["z"].value, "type": "portal", "label": label })
-                                elif text1 == '(R)':
-                                    label = text2
-                                    if text3 != "":
-                                        label = label + " " + text3
-                                    if text4 != "" and text4 != text1:
-                                        label = label + " " + text4
-                                    markers[f].append({"x": e["x"].value, "z": e["z"].value, "type": "ruins", "label": label })
-                                elif text1 == '(M)':
-                                    label = text2
-                                    if text3 != "":
-                                        label = label + " " + text3
-                                    if text4 != "" and text4 != text1:
-                                        label = label + " " + text4
-                                    markers[f].append({"x": e["x"].value, "z": e["z"].value, "type": "mine", "label": label })
-                                elif text1 == '(K)':
-                                    label = text2
-                                    if text3 != "":
-                                        label = label + " " + text3
-                                    if text4 != "" and text4 != text1:
-                                        label = label + " " + text4
-                                    markers[f].append({"x": e["x"].value, "z": e["z"].value, "type": "keep", "label": label })
-                                elif text1 == '(T)':
-                                    label = text2
-                                    if text3 != "":
-                                        label = label + " " + text3
-                                    if text4 != "" and text4 != text1:
-                                        label = label + " " + text4
-                                    markers[f].append({"x": e["x"].value, "z": e["z"].value, "type": "tower", "label": label })
-                                elif text1 == '(F)':
-                                    label = text2
-                                    if text3 != "":
-                                        label = label + " " + text3
-                                    if text4 != "" and text4 != text1:
-                                        label = label + " " + text4
-                                    markers[f].append({"x": e["x"].value, "z": e["z"].value, "type": "farm", "label": label })
-                                elif text1 == "[*]":
-                                    label = text2
-                                    if text3 != "":
-                                        label = label + " " + text3
-                                    if text4 != "" and text4 != text1:
-                                        label = label + " " + text4
-                                    markers[f].append({"x": e["x"].value, "z": e["z"].value, "type": "square", "label": label })
-                                elif text1 == "(*)":
-                                    label = text2
-                                    if text3 != "":
-                                        label = label + " " + text3
-                                    if text4 != "" and text4 != text1:
-                                        label = label + " " + text4
-                                    markers[f].append({"x": e["x"].value, "z": e["z"].value, "type": "circle", "label": label })
-                                elif text1 == "((*))":
-                                    label = text2
-                                    if text3 != "":
-                                        label = label + " " + text3
-                                    if text4 != "" and text4 != text1:
-                                        label = label + " " + text4
-                                    markers[f].append({"x": e["x"].value, "z": e["z"].value, "type": "big_circle", "label": label })
-                                else:
-                                    pass
-
+        markers[f] = m
         tile_im.save(output_f)
 
         out("\n")
 
-    f = open(output_path + "/markers.json", "w")
+    f = open(output_path + "/tile/markers.json", "w")
     json.dump(markers, f)
     out("Wrote markers.json\n")
 
-    f = open(output_path + "/tiles.json", "w")
+    f = open(output_path + "/tile/tiles.json", "w")
     json.dump(tiles, f)
     out("Wrote tiles.json\n")
 
