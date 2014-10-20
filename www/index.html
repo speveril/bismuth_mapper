@@ -22,15 +22,28 @@ var camera = [0,0,1];
 
 function loadImages() {
     var $loadHelper = $('.load-helper');
+    var marker_icons = ['icon.x.png','icon.square.png','icon.circle.png','icon.portal.png','icon.big_circle.png','icon.mine.png','icon.farm.png','icon.keep.png','icon.tower.png','icon.ruins.png'];
+
+    for (var i = 0; i < marker_icons.length; i++) {
+        var $img = $('<img>');
+        var m = marker_icons[i].match(/\w+\.(\w+)\.\w+/);
+        $img.attr('src', m[0]);
+        $img.addClass("icon-" + m[1]);
+        $loadHelper.append($img);
+
+        things_to_load++;
+        $img.on('error load', function() { things_loaded++; });
+    }
 
     for (var i = 0; i < tiles.length; i++) {
         var $img = $('<img>');
-        $img.attr('src', tiles[i].src);
+        $img.attr('src', tiles[i].src + '?rnd=' + Math.random());
         $loadHelper.append($img);
         tiles[i].img = $img[0];
 
         things_to_load++;
-        $img.on('error load', function() { things_loaded++; });
+        $img.on('load', function() { things_loaded++; });
+        $img.on('error', function(tile) { tile.img = null; things_loaded++; }.bind(this, tiles[i]));
     }
 }
 
@@ -57,6 +70,11 @@ function redrawMap() {
     ctxO.oImageSmoothingEnabled = false;
     ctxO.webkitImageSmoothingEnabled = false;
 
+    ctxO.font = "10pt Calibri";
+    ctxO.fillStyle = '#ffffff';
+    ctxO.strokeStyle = '#000000';
+    ctxO.lineWidth = 4;
+
     var w = $mapCanvas.attr('width');
     var h = $mapCanvas.attr('height');
 
@@ -64,12 +82,35 @@ function redrawMap() {
     ctxO.clearRect(0, 0, w, h);
 
     for (var i = 0; i < tiles.length; i++) {
-        var x = (tiles[i].x - camera[0]) * camera[2];
-        var y = (tiles[i].y - camera[1]) * camera[2];
+        var tile = tiles[i]
+        var x = (tile.x - camera[0]) * camera[2];
+        var y = (tile.y - camera[1]) * camera[2];
         var sz = 512 * camera[2];
 
-        if (x + sz >= 0 && x < w && y + sz >= 0 && y < h) {
-            ctx.drawImage(tiles[i].img, x, y, sz, sz);
+        if (x + sz >= 0 && x < w && y + sz >= 0 && y < h && tile.img) {
+            ctx.drawImage(tile.img, x, y, sz, sz);
+            // console.log(markers[tile.region]);
+        }
+    }
+
+    for (var i = 0; i < tiles.length; i++) {
+        var tile = tiles[i]
+        var x = (tile.x - camera[0]) * camera[2];
+        var y = (tile.y - camera[1]) * camera[2];
+        var sz = 512 * camera[2];
+
+        if (x + sz >= 0 && x < w && y + sz >= 0 && y < h && tile.img) {
+            for (var j = 0; j < markers[tile.region].length; j++) {
+                var mark = markers[tile.region][j];
+                var mx = (mark.x - camera[0] + 0.5) * camera[2];
+                var my = (mark.z - camera[1] + 0.5) * camera[2];
+                var text = mark.label.replace(/\\u0027/g, "'");
+                var textw = ctxO.measureText(text);
+
+                ctxO.drawImage($('.icon-' + mark.type)[0], mx - 5, my - 5);
+                ctxO.strokeText(text, mx - textw.width / 2, my - 8);
+                ctxO.fillText(text, mx - textw.width / 2, my - 9);
+            }
         }
     }
 
@@ -104,7 +145,6 @@ function setupInput() {
             camera[0] -= dx / camera[2];
             camera[1] -= dy / camera[2];
             redrawMap();
-
         }
         lastMousePos = [evt.pageX, evt.pageY];
     });
@@ -131,22 +171,24 @@ function loadingError(xhr, type, error) {
 }
 
 function startLoading() {
-    $.ajax({dataType:'json', url:'tile/tiles.json', success: loadedTileJSON, error: loadingError});
+    $.ajax({dataType:'json', url:'tile/tiles.json?rnd=' + Math.random(), success: loadedTileJSON, error: loadingError});
 }
 
 function loadedTileJSON(data) {
     tiles = [];
     for (k in data) {
         if (data.hasOwnProperty(k)) {
+            data[k].region = k;
             tiles.push(data[k]);
         }
     }
     loadImages();
-    $.ajax({dataType:'json', url:'tile/markers.json', success: loadedMarkerJSON, error: loadingError});
+    $.ajax({dataType:'json', url:'tile/markers.json?rnd=' + Math.random(), success: loadedMarkerJSON, error: loadingError});
 }
 
 function loadedMarkerJSON(data) {
     markers = data;
+    console.log(markers);
     waitForLoad(loadedImages);
 }
 
