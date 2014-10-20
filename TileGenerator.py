@@ -49,9 +49,11 @@ class TileGenerator:
                             tileZ = (worldZ % 512) + z
 
                             if mapX >= 0 and mapX < self.combined_width and mapY >= 0 and mapY < self.combined_height and self.mask_data[mapX + (mapY * self.combined_width)] != 0:
-                                h = data['HeightMap'].value[x + z * 16] + 1
+                                h = data['HeightMap'].value[x + z * 16] + 2
                                 cl = 0
                                 water_depth = 0
+                                light = 0.5
+
                                 while (cl == 0 or water_depth > 0) and h >= 0:
                                     h = h - 1
                                     sect = int(h/16)
@@ -66,6 +68,9 @@ class TileGenerator:
 
                                         if bl == 8 or bl == 9: # water handling
                                             water_depth += 1
+                                        elif bl == 10 or bl == 11: # lava handling
+                                            cl = self.colors['block'][bl]
+                                            light = 1
                                         else:
                                             if water_depth > 0:
                                                 if water_depth < 12 or (water_depth < 24 and (mapX + mapY) % 2):
@@ -73,9 +78,6 @@ class TileGenerator:
                                                 else:
                                                     cl = self.colors['water'][1]
                                                 water_depth = 0
-                                            elif bl == 35 or bl == 159 or bl == 172: # coloured blocks
-                                                dataValue = self.get_nibble(sections[sect]['Data'].value, blockIndex)
-                                                cl = self.colors['tints'][dataValue]
                                             else:
                                                 cl = self.colors['block'][bl]
 
@@ -89,6 +91,10 @@ class TileGenerator:
                                     if h == 0 and cl == 0:
                                         out("!!" + str(x) + "," + str(z) + "!!")
 
+                                # elif bl == 35 or bl == 159 or bl == 172: # coloured blocks
+                                if cl == -1:
+                                    dataValue = self.get_nibble(sections[sect]['Data'].value, blockIndex)
+                                    cl = self.colors['tint'] + dataValue
                                 color = self.colors['actual'][cl]
 
                                 if tileZ > 0 and heights[tileX * 512 + (tileZ - 1)] and heights[tileX * 512 + (tileZ - 1)] > h:
