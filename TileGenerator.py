@@ -91,10 +91,9 @@ class TileGenerator:
                                     if h == 0 and cl == 0:
                                         out("!!" + str(x) + "," + str(z) + "!!")
 
-                                # elif bl == 35 or bl == 159 or bl == 172: # coloured blocks
-                                if cl == -1:
+                                if cl < 0:
                                     dataValue = self.get_nibble(sections[sect]['Data'].value, blockIndex)
-                                    cl = self.colors['tint'] + dataValue
+                                    cl = self.colors['tint_colors'][-cl][dataValue]
                                 color = self.colors['actual'][cl]
 
                                 if tileZ > 0 and heights[tileX * 512 + (tileZ - 1)] and heights[tileX * 512 + (tileZ - 1)] > h:
