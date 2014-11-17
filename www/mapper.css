@@ -16,3 +16,40 @@ canvas, .input-catcher {
     top: -2px;
     left: -2px;
 }
+
+.options {
+    overflow: hidden;
+    min-width: 16px;
+    width: 16px;
+    min-height: 16px;
+    height: 16px;
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    background: rgba(128, 128, 128, 0.5);
+    border: 1px solid #000;
+    padding: 8px;
+    transition: width .25s, height .25s, background-color .25s;
+    border-radius: 5px;
+}
+    .options.open {
+        width: 400px;
+        height: auto;
+        background: #fff;
+    }
+    .options .knob  {
+        width: 32px;
+        height: 32px;
+        position: absolute;
+        top: 0;
+        right: 0;
+        text-align: center;
+        cursor: pointer;
+        line-height: 32px;
+    }
+    .options .knob::before {
+        content: "\2661";
+    }
+    .options.open .knob::before  {
+        content: "\00d7";
+    }

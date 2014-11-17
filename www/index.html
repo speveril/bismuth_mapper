@@ -10,6 +10,76 @@
         <canvas id="map-surface"></canvas>
         <canvas id="overlay-surface"></canvas>
         <div class="input-catcher"></div>
+        <div class="options">
+            <div class="knob"></div>
+            <div id="header">
+                <h1>Bismuth Minecraft Server</h1>
+                running current vanilla release (1.8.0)
+            </div>
+            <p>
+                <strong>Map Controls</strong><br>
+                <input type="checkbox" id="overlay_icons_toggle" checked="checked"> Icons<br>
+                <input type="checkbox" id="overlay_labels_toggle" checked="checked"> Labels<br>
+            </p>
+            <p>
+                <strong>Sign Formats for Markers</strong>
+                <table>
+                    <tr>
+                        <td class="sign"><em>&lt;icon text&gt;</em><br>The rest<br>is for<br>the label</td>
+                    </tr>
+                </table>
+            </p>
+            <p>
+                <strong>Available icons</strong>
+                <table>
+                    <tr>
+                        <td width="20%">x</td>
+                        <td width="10%">&rarr;</td>
+                        <td width="20%"><img src="icon.x"></td>
+
+                        <td width="20%">(*)</td>
+                        <td width="10%">&rarr;</td>
+                        <td width="20%"><img src="icon.circle"></td>
+                    </tr>
+                    <tr>
+                        <td>[*]</td>
+                        <td>&rarr;</td>
+                        <td><img src="icon.square"></td>
+
+                        <td>((*))</td>
+                        <td>&rarr;</td>
+                        <td><img src="icon.big_circle"></td>
+                    </tr>
+                    <tr>
+                        <td>(K)</td>
+                        <td>&rarr;</td>
+                        <td><img src="icon.keep"></td>
+
+                        <td>(T)</td>
+                        <td>&rarr;</td>
+                        <td><img src="icon.tower"></td>
+                    </tr>
+                    <tr>
+                        <td>(F)</td>
+                        <td>&rarr;</td>
+                        <td><img src="icon.farm"></td>
+
+                        <td>(M)</td>
+                        <td>&rarr;</td>
+                        <td><img src="icon.mine"></td>
+                    </tr>
+                    <tr>
+                        <td>^^</td>
+                        <td>&rarr;</td>
+                        <td><img src="icon.portal"></td>
+
+                        <td>(R)</td>
+                        <td>&rarr;</td>
+                        <td><img src="icon.ruins"></td>
+                    </tr>
+                </table>
+            </p>
+        </div>
     </body>
 
 <script>
@@ -19,6 +89,14 @@ var things_loaded = 0;
 var things_to_load = 0;
 
 var camera = [0,0,1];
+var options = {
+    show_icons: true,
+    show_labels: true
+};
+
+function save() {
+    document.cookie = JSON.stringify({ camera: camera, options: options});
+}
 
 function loadImages() {
     var $loadHelper = $('.load-helper');
@@ -89,36 +167,41 @@ function redrawMap() {
 
         if (x + sz >= 0 && x < w && y + sz >= 0 && y < h && tile.img) {
             ctx.drawImage(tile.img, x, y, sz, sz);
-            // console.log(markers[tile.region]);
         }
     }
 
-    for (var i = 0; i < tiles.length; i++) {
-        var tile = tiles[i]
-        var x = (tile.x - camera[0]) * camera[2];
-        var y = (tile.y - camera[1]) * camera[2];
-        var sz = 512 * camera[2];
+    if (options.show_icons || options.show_labels) {
+        for (var i = 0; i < tiles.length; i++) {
+            var tile = tiles[i]
+            var x = (tile.x - camera[0]) * camera[2];
+            var y = (tile.y - camera[1]) * camera[2];
+            var sz = 512 * camera[2];
 
-        if (x + sz >= 0 && x < w && y + sz >= 0 && y < h && markers[tile.region]) {
-            for (var j = 0; j < markers[tile.region].length; j++) {
-                var mark = markers[tile.region][j];
-                var mx = (mark.x - camera[0] + 0.5) * camera[2];
-                var my = (mark.z - camera[1] + 0.5) * camera[2];
-                var text = mark.label.replace(/\\u0027/g, "'");
-                var textw = ctxO.measureText(text);
+            if (x + sz >= 0 && x < w && y + sz >= 0 && y < h && markers[tile.region]) {
+                for (var j = 0; j < markers[tile.region].length; j++) {
+                    var mark = markers[tile.region][j];
+                    var mx = (mark.x - camera[0] + 0.5) * camera[2];
+                    var my = (mark.z - camera[1] + 0.5) * camera[2];
+                    var text = mark.label.replace(/\\u0027/g, "'");
+                    var textw = ctxO.measureText(text);
 
-                ctxO.drawImage($('.icon-' + mark.type)[0], mx - 5, my - 5);
-                // var iconmetrics = ctxO.measureText('x');
-                // ctxO.strokeText('x', mx - iconmetrics.width / 2, my + 3);
-                // ctxO.fillText('x', mx - iconmetrics.width / 2, my + 2);
+                    if (options.show_icons) {
+                        ctxO.drawImage($('.icon-' + mark.type)[0], mx - 5, my - 5);
+                        // var iconmetrics = ctxO.measureText('x');
+                        // ctxO.strokeText('x', mx - iconmetrics.width / 2, my + 3);
+                        // ctxO.fillText('x', mx - iconmetrics.width / 2, my + 2);
+                    }
 
-                ctxO.strokeText(text, mx - textw.width / 2, my - 8);
-                ctxO.fillText(text, mx - textw.width / 2, my - 9);
+                    if (options.show_labels) {
+                        ctxO.strokeText(text, mx - textw.width / 2, my - 8);
+                        ctxO.fillText(text, mx - textw.width / 2, my - 9);
+                    }
+                }
             }
         }
     }
 
-    document.cookie = JSON.stringify(camera);
+    save();
 }
 
 function waitForLoad(cb) {
@@ -174,6 +257,21 @@ function setupInput() {
     $('.input-catcher').on('wheel', scrollWheelHandler);
 }
 
+function setupOptions() {
+    $('.options .knob').on('click', function() {
+        $('.options').toggleClass('open');
+    });
+
+    $('.options #overlay_icons_toggle').on('change', function() {
+        options.show_icons = $('.options #overlay_icons_toggle').is(":checked");
+        redrawMap();
+    });
+
+    $('.options #overlay_labels_toggle').on('change', function() {
+        options.show_labels = $('.options #overlay_labels_toggle').is(":checked");
+        redrawMap();
+    });
+}
 
 // --- loading stuff ---
 
@@ -199,19 +297,21 @@ function loadedTileJSON(data) {
 
 function loadedMarkerJSON(data) {
     markers = data;
-    console.log(markers);
     waitForLoad(loadedImages);
 }
 
 function loadedImages() {
     if (document.cookie) {
-        camera = JSON.parse(document.cookie);
+        var saved = JSON.parse(document.cookie);
+        if (saved.camera) { camera = saved.camera; }
+        if (saved.options) { options = saved.options; }
     }
 
-    if (!document.cookie || camera.length != 3 || camera[2] < 0.1 || camera[2] > 16) {
+    if (!document.cookie || !camera || camera.length != 3 || camera[2] < 0.1 || camera[2] > 16) {
         camera = [-$('canvas').width() / 2, -$('canvas').height() / 2, 1];
     }
 
+    setupOptions();
     setupInput();
 
     $(window).on('resize',resizeCanvases);
