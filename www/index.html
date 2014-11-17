@@ -152,21 +152,28 @@ function setupInput() {
         }
         lastMousePos = [evt.pageX, evt.pageY];
     });
-    $('.input-catcher').on('mousewheel', function(evt) {
+
+
+    var scrollWheelHandler = function(evt) {
         var wX = camera[0] + lastMousePos[0] / camera[2];
         var wY = camera[1] + lastMousePos[1] / camera[2];
+        var delta = evt.originalEvent.wheelDelta || -evt.originalEvent.deltaY;
 
-        if (evt.originalEvent.wheelDelta > 0 && camera[2] < 8) {
+        if (delta > 0 && camera[2] < 8) {
             camera[2] /= zoomSpeed;
-        } else if (evt.originalEvent.wheelDelta < 0 && camera[2] > 0.2) {
+        } else if (delta < 0 && camera[2] > 0.2) {
             camera[2] *= zoomSpeed;
         }
 
         camera[0] = wX - lastMousePos[0] / camera[2];
         camera[1] = wY - lastMousePos[1] / camera[2];
         redrawMap();
-    });
+    }
+
+    $('.input-catcher').on('mousewheel', scrollWheelHandler);
+    $('.input-catcher').on('wheel', scrollWheelHandler);
 }
+
 
 // --- loading stuff ---
 
