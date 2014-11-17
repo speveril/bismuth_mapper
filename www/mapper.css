@@ -19,23 +19,26 @@ canvas, .input-catcher {
 
 .options {
     overflow: hidden;
-    min-width: 16px;
-    width: 16px;
-    min-height: 16px;
-    height: 16px;
+    min-width: 32px;
+    width: 32px;
+    min-height: 32px;
+    height: 32px;
     position: absolute;
     top: 16px;
     left: 16px;
     background: rgba(128, 128, 128, 0.5);
     border: 1px solid #000;
-    padding: 8px;
     transition: width .25s, height .25s, background-color .25s;
     border-radius: 5px;
+    font-family: Calibri;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
     .options.open {
         width: 400px;
-        height: auto;
+        height: calc(100% - 48px);
         background: #fff;
+        padding: 8px 32px;
     }
     .options .knob  {
         width: 32px;
@@ -52,4 +55,26 @@ canvas, .input-catcher {
     }
     .options.open .knob::before  {
         content: "\00d7";
+    }
+
+    .options #header, .options p {
+        display: none;
+    }
+    .options.open #header, .options.open p {
+        display: block;
+    }
+    .options h1 {
+        font-size: 120%;
+        margin: 0;
+    }
+    .options .sign {
+        font-family: Consolas;
+        margin: auto;
+        text-align: center;
+        background: #864;
+        padding: 8px 32px;
+        border: 5px solid #642;
+    }
+    .options table {
+        margin: auto;
     }
