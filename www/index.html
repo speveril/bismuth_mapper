@@ -303,7 +303,12 @@ function loadedMarkerJSON(data) {
 
 function loadedImages() {
     if (document.cookie) {
-        var saved = JSON.parse(document.cookie);
+        var saved = {};
+        try {
+            saved = JSON.parse(document.cookie);
+        } catch {
+            // no-op, fall back on the empty object
+        }
         if (saved.camera) { camera = saved.camera; }
         if (saved.options) { options = saved.options; }
     }
