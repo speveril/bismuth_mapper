@@ -44,38 +44,38 @@
                     <tr>
                         <td>[*]</td>
                         <td>&rarr;</td>
-                        <td><img src="icon.square"></td>
+                        <td><img src="icon.square.png"></td>
 
                         <td>((*))</td>
                         <td>&rarr;</td>
-                        <td><img src="icon.big_circle"></td>
+                        <td><img src="icon.big_circle.png"></td>
                     </tr>
                     <tr>
                         <td>(K)</td>
                         <td>&rarr;</td>
-                        <td><img src="icon.keep"></td>
+                        <td><img src="icon.keep.png"></td>
 
                         <td>(T)</td>
                         <td>&rarr;</td>
-                        <td><img src="icon.tower"></td>
+                        <td><img src="icon.tower.png"></td>
                     </tr>
                     <tr>
                         <td>(F)</td>
                         <td>&rarr;</td>
-                        <td><img src="icon.farm"></td>
+                        <td><img src="icon.farm.png"></td>
 
                         <td>(M)</td>
                         <td>&rarr;</td>
-                        <td><img src="icon.mine"></td>
+                        <td><img src="icon.mine.png"></td>
                     </tr>
                     <tr>
                         <td>^^</td>
                         <td>&rarr;</td>
-                        <td><img src="icon.portal"></td>
+                        <td><img src="icon.portal.png"></td>
 
                         <td>(R)</td>
                         <td>&rarr;</td>
-                        <td><img src="icon.ruins"></td>
+                        <td><img src="icon.ruins.png"></td>
                     </tr>
                 </table>
             </p>
@@ -306,7 +306,7 @@ function loadedImages() {
         var saved = {};
         try {
             saved = JSON.parse(document.cookie);
-        } catch {
+        } catch(e) {
             // no-op, fall back on the empty object
         }
         if (saved.camera) { camera = saved.camera; }
