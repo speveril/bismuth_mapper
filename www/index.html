@@ -19,8 +19,8 @@
             </div>
             <p>
                 <strong>Map Controls</strong><br>
-                <label for="overlay_icons_toggle"><input type="checkbox" id="overlay_icons_toggle" checked="checked"> Icons</label>
-                <label for="overlay_labels_toggle"><input type="checkbox" id="overlay_labels_toggle" checked="checked"> Labels</label>
+                <label for="overlay_icons_toggle"><input type="checkbox" id="overlay_icons_toggle"> Icons</label>
+                <label for="overlay_labels_toggle"><input type="checkbox" id="overlay_labels_toggle"> Labels</label>
             </p>
             <p>
                 <strong>Sign Formats for Markers</strong>
@@ -264,11 +264,13 @@ function setupOptions() {
         $('.options').toggleClass('open');
     });
 
+    options.show_icons ? $('.options #overlay_icons_toggle').attr('checked','checked') : $('.options #overlay_icons_toggle').removeAttr('checked');
     $('.options #overlay_icons_toggle').on('change', function() {
         options.show_icons = $('.options #overlay_icons_toggle').is(":checked");
         redrawMap();
     });
 
+    options.show_labels ? $('.options #overlay_labels_toggle').attr('checked','checked') : $('.options #overlay_labels_toggle').removeAttr('checked');
     $('.options #overlay_labels_toggle').on('change', function() {
         options.show_labels = $('.options #overlay_labels_toggle').is(":checked");
         redrawMap();

@@ -20,11 +20,12 @@ body.loading::before {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 
-    color: #fff;
+    color: #5ee;
     content: "\e601";
     position: absolute;
     top: 50%;
     left: 50%;
+    font-size: 250%;
     transform: translateX(-50%) translateY(-50%);
     -webkit-animation-name: spin;
     -webkit-animation-duration: 1s;
