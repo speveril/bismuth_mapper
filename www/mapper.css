@@ -1,3 +1,37 @@
+@-webkit-keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+body {
+    background: #000;
+}
+
+body.loading::before {
+    font-family: 'icomoon';
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    color: #fff;
+    content: "\e601";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    -webkit-animation-name: spin;
+    -webkit-animation-duration: 1s;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-timing-function: linear;
+}
+
 canvas, .input-catcher {
     position: absolute;
     top: 0;
@@ -50,12 +84,6 @@ canvas, .input-catcher {
         cursor: pointer;
         line-height: 32px;
     }
-    .options .knob::before {
-        content: "\2661";
-    }
-    .options.open .knob::before  {
-        content: "\00d7";
-    }
 
     .options #header, .options p {
         display: none;
@@ -77,4 +105,11 @@ canvas, .input-catcher {
     }
     .options table {
         margin: auto;
+    }
+    .options label {
+        display: block;
+        margin: 2px 15px;
+    }
+    .options label:hover {
+        background: #eee;
     }

@@ -2,24 +2,25 @@
     <head>
         <title>BISMUTH MINECRAFT</title>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="icons.css">
         <link rel="stylesheet" type="text/css" href="mapper.css">
     </head>
 
-    <body>
+    <body class="loading">
         <div class="load-helper"></div>
         <canvas id="map-surface"></canvas>
         <canvas id="overlay-surface"></canvas>
         <div class="input-catcher"></div>
         <div class="options">
-            <div class="knob"></div>
+            <div class="knob icon-cog"></div>
             <div id="header">
                 <h1>Bismuth Minecraft Server</h1>
                 running current vanilla release (1.8.1)
             </div>
             <p>
                 <strong>Map Controls</strong><br>
-                <input type="checkbox" id="overlay_icons_toggle" checked="checked"> Icons<br>
-                <input type="checkbox" id="overlay_labels_toggle" checked="checked"> Labels<br>
+                <label for="overlay_icons_toggle"><input type="checkbox" id="overlay_icons_toggle" checked="checked"> Icons</label>
+                <label for="overlay_labels_toggle"><input type="checkbox" id="overlay_labels_toggle" checked="checked"> Labels</label>
             </p>
             <p>
                 <strong>Sign Formats for Markers</strong>
@@ -157,7 +158,7 @@ function redrawMap() {
     var w = $mapCanvas.attr('width');
     var h = $mapCanvas.attr('height');
 
-    ctx.fillRect(0, 0, w, h);
+    ctx.clearRect(0, 0, w, h);
     ctxO.clearRect(0, 0, w, h);
 
     for (var i = 0; i < tiles.length; i++) {
@@ -320,6 +321,7 @@ function loadedImages() {
     setupOptions();
     setupInput();
 
+    $('body').removeClass('loading');
     $(window).on('resize',resizeCanvases);
     resizeCanvases();
 }
