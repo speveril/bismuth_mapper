@@ -35,6 +35,9 @@ class Tag:
                 return self.value[key]
         return None
 
+    def __str__(self):
+        return "<" + Tag_Type_Name[self.type] + " " + str(self.value) + ">"
+
     def is_type(self, type_key):
         if type(type_key) == type([]):
             for k in type_key:
@@ -49,18 +52,18 @@ class Tag:
             return
 
         elif self.type == Tag_Type['TAG_Byte'] or self.type == Tag_Type['TAG_Short'] or self.type == Tag_Type['TAG_Int'] or self.type == Tag_Type['TAG_Long'] or self.type == Tag_Type['TAG_Float'] or self.type == Tag_Type['TAG_Double'] or self.type == Tag_Type['TAG_String']:
-            print (" " * indent) + "[" + Tag_Type_Name[self.type] + "] " + str(self.name) + ": " + str(self.value)
+            print((" " * indent) + "[" + Tag_Type_Name[self.type] + "] " + str(self.name) + ": " + str(self.value))
 
         elif self.type == Tag_Type['TAG_List'] or self.type == Tag_Type['TAG_Byte_Array'] or self.type == Tag_Type['TAG_Int_Array']:
-            print (" " * indent) + "[" + Tag_Type_Name[self.type] + "] " + str(self.name) + ": " + str(self.value)
+            print((" " * indent) + "[" + Tag_Type_Name[self.type] + "] " + str(self.name) + ": " + str(self.value))
 
         elif self.type == Tag_Type['TAG_Compound']:
-            print (" " * indent) + "[" + Tag_Type_Name[self.type] + "] " + str(self.name) + ": "
+            print((" " * indent) + "[" + Tag_Type_Name[self.type] + "] " + str(self.name) + ": ")
             for t in self.value:
                 self[t].pretty_print(indent=indent + 2)
 
         else:
-            print (" " * indent) + "[" + Tag_Type_Name[self.type] + "] " + str(self.name)
+            print((" " * indent) + "[" + Tag_Type_Name[self.type] + "] " + str(self.name))
 
 # -----------------------------------------------------------------------------------------------------------------
 
@@ -130,7 +133,7 @@ class TagReader:
             pass
 
         else:
-            print "BAD TAG TYPE: " + str(type)
+            print("BAD TAG TYPE: " + str(type))
             exit
 
         return Tag(name=name, type=type, value=value)

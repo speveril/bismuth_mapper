@@ -10,6 +10,8 @@ class TileGenerator:
         self.combined_height = maxz - minz
         self.colors = colors
 
+        print(self.combined_width, self.combined_height)
+
     def get_nibble(self, data, index):
         byte = data[index >> 1]
         #out "nibble(", index, byte, (index % 2), ")",
@@ -30,16 +32,16 @@ class TileGenerator:
             if counter % 64 == 0:
                 out(".")
 
-            if ch[1] and isinstance(ch[1].value, dict) and ch[1].value and 'Level' in ch[1].value:
-                data = ch[1]['Level']
+            if ch[1] and isinstance(ch[1].value, dict) and ch[1].value and b'Level' in ch[1].value:
+                data = ch[1][b'Level']
 
-                worldX = data['xPos'].value * 16
-                worldZ = data['zPos'].value * 16
+                worldX = data[b'xPos'].value * 16
+                worldZ = data[b'zPos'].value * 16
 
-                if 'Sections' in data.value and 'HeightMap' in data.value:
+                if b'Sections' in data.value and b'HeightMap' in data.value:
                     sections = [None] * 16
-                    for s in data['Sections'].value:
-                        sections[s['Y'].value] = s
+                    for s in data[b'Sections'].value:
+                        sections[s[b'Y'].value] = s
 
                     for x in range(16):
                         for z in range(16):
@@ -48,8 +50,8 @@ class TileGenerator:
                             tileX = (worldX % 512) + x
                             tileZ = (worldZ % 512) + z
 
-                            if mapX >= 0 and mapX < self.combined_width and mapY >= 0 and mapY < self.combined_height and self.mask_data[mapX + (mapY * self.combined_width)] != 0:
-                                h = data['HeightMap'].value[x + z * 16] + 2
+                            if mapX >= 0 and mapX < self.combined_width and mapY >= 0 and mapY < self.combined_height and (self.mask_data == None or self.mask_data[mapX + (mapY * self.combined_width)] != 0):
+                                h = data[b'HeightMap'].value[x + z * 16] + 2
                                 cl = 0
                                 water_depth = 0
                                 light = 0.5
@@ -60,10 +62,10 @@ class TileGenerator:
                                     if sections[sect]:
                                         blockIndex = x + z * 16 + (h % 16) * 256
 
-                                        bl = sections[sect]['Blocks'].value[blockIndex]
+                                        bl = sections[sect][b'Blocks'].value[blockIndex]
 
-                                        if sections[sect]['Add'] != None:
-                                            addValue = self.get_nibble(sections[sect]['Add'].value, blockIndex)
+                                        if sections[sect][b'Add'] != None:
+                                            addValue = self.get_nibble(sections[sect][b'Add'].value, blockIndex)
                                             bl = bl + (addValue << 8)
 
                                         if bl == 8 or bl == 9: # water handling
@@ -82,7 +84,7 @@ class TileGenerator:
                                                 cl = self.colors['block'][bl]
 
                                         if not bl:
-                                            light = 0.50 + (self.get_nibble(sections[sect]['BlockLight'].value, blockIndex) * 0.034)
+                                            light = 0.50 + (self.get_nibble(sections[sect][b'BlockLight'].value, blockIndex) * 0.034)
 
                                         if bl in [31,32,37,38,39,40,78]:
                                             h = h - 1
@@ -92,7 +94,7 @@ class TileGenerator:
                                         out("!!" + str(x) + "," + str(z) + "!!")
 
                                 if cl < 0:
-                                    dataValue = self.get_nibble(sections[sect]['Data'].value, blockIndex)
+                                    dataValue = self.get_nibble(sections[sect][b'Data'].value, blockIndex)
                                     cl = self.colors['tint_colors'][-cl][dataValue]
                                 color = self.colors['actual'][cl]
 
@@ -103,89 +105,50 @@ class TileGenerator:
 
                                 tile_im.putpixel((tileX, tileZ), (int(color[0] * light), int(color[1] * light), int(color[2] * light)))
 
-                if 'TileEntities' in data.value and len(data['TileEntities'].value) > 0:
-                    for e in data['TileEntities'].value:
-                        if e['id'].value == 'Sign':
-                            x = e["x"].value - self.world_offset[0]
-                            z = e["z"].value - self.world_offset[1]
+                if 'TileEntities' in data.value and len(data[b'TileEntities'].value) > 0:
+                    for e in data[b'TileEntities'].value:
+                        if e[b'id'].value == 'Sign':
+                            x = e[b"x"].value - self.world_offset[0]
+                            z = e[b"z"].value - self.world_offset[1]
 
                             # strip the " characters off the beginning and end of the string
-                            text1 = e["Text1"].value[1:-1]
-                            text2 = e["Text2"].value[1:-1]
-                            text3 = e["Text3"].value[1:-1]
-                            text4 = e["Text4"].value[1:-1]
+                            text1 = e[b"Text1"].value[1:-1]
+                            text2 = e[b"Text2"].value[1:-1]
+                            text3 = e[b"Text3"].value[1:-1]
+                            text4 = e[b"Text4"].value[1:-1]
 
                             if x > 0 and x < self.combined_width - 1 and z > 0 and z < self.combined_height - 1:
+                                label = text2
+                                if text3 != "":
+                                    label = label + " " + text3
+                                if text4 != "" and text4 != text1:
+                                    label = label + " " + text4
+
+                                markertype = None
+
                                 if text1 == 'X' or text1 == "x" or text1 == "(X)" or text1 == "(x)":
-                                    label = text2
-                                    if text3 != "":
-                                        label = label + " " + text3
-                                    if text4 != "" and text4 != text1:
-                                        label = label + " " + text4
-                                    markers.append({"x": e["x"].value, "z": e["z"].value, "type": "x", "label": label })
+                                    markertype = 'x'
                                 elif text1 == '^^':
-                                    label = text2
-                                    if text3 != "":
-                                        label = label + " " + text3
-                                    if text4 != "" and text4 != text1:
-                                        label = label + " " + text4
-                                    markers.append({"x": e["x"].value, "z": e["z"].value, "type": "portal", "label": label })
+                                    markertype = "portal"
                                 elif text1 == '(R)':
-                                    label = text2
-                                    if text3 != "":
-                                        label = label + " " + text3
-                                    if text4 != "" and text4 != text1:
-                                        label = label + " " + text4
-                                    markers.append({"x": e["x"].value, "z": e["z"].value, "type": "ruins", "label": label })
+                                    markertype = "ruins"
                                 elif text1 == '(M)':
-                                    label = text2
-                                    if text3 != "":
-                                        label = label + " " + text3
-                                    if text4 != "" and text4 != text1:
-                                        label = label + " " + text4
-                                    markers.append({"x": e["x"].value, "z": e["z"].value, "type": "mine", "label": label })
+                                    markertype = "mine"
                                 elif text1 == '(K)':
-                                    label = text2
-                                    if text3 != "":
-                                        label = label + " " + text3
-                                    if text4 != "" and text4 != text1:
-                                        label = label + " " + text4
-                                    markers.append({"x": e["x"].value, "z": e["z"].value, "type": "keep", "label": label })
+                                    markertype = "keep"
                                 elif text1 == '(T)':
-                                    label = text2
-                                    if text3 != "":
-                                        label = label + " " + text3
-                                    if text4 != "" and text4 != text1:
-                                        label = label + " " + text4
-                                    markers.append({"x": e["x"].value, "z": e["z"].value, "type": "tower", "label": label })
+                                    markertype = "tower"
                                 elif text1 == '(F)':
-                                    label = text2
-                                    if text3 != "":
-                                        label = label + " " + text3
-                                    if text4 != "" and text4 != text1:
-                                        label = label + " " + text4
-                                    markers.append({"x": e["x"].value, "z": e["z"].value, "type": "farm", "label": label })
+                                    markertype = "farm"
                                 elif text1 == "[*]":
-                                    label = text2
-                                    if text3 != "":
-                                        label = label + " " + text3
-                                    if text4 != "" and text4 != text1:
-                                        label = label + " " + text4
-                                    markers.append({"x": e["x"].value, "z": e["z"].value, "type": "square", "label": label })
+                                    markertype = "square"
                                 elif text1 == "(*)":
-                                    label = text2
-                                    if text3 != "":
-                                        label = label + " " + text3
-                                    if text4 != "" and text4 != text1:
-                                        label = label + " " + text4
-                                    markers.append({"x": e["x"].value, "z": e["z"].value, "type": "circle", "label": label })
+                                    markertype = "circle"
                                 elif text1 == "((*))":
-                                    label = text2
-                                    if text3 != "":
-                                        label = label + " " + text3
-                                    if text4 != "" and text4 != text1:
-                                        label = label + " " + text4
-                                    markers.append({"x": e["x"].value, "z": e["z"].value, "type": "big_circle", "label": label })
+                                    markertype = 'big_circle'
                                 else:
                                     pass
+
+                                if markertype != None:
+                                    markers.append({"x": e[b"x"].value, "z": e[b"z"].value, "type": markertype, "label": label })
         return (tile_im, markers)

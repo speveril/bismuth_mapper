@@ -52,6 +52,12 @@ canvas, .input-catcher {
     left: -2px;
 }
 
+.to-origin {
+    text-decoration: underline;
+    color: blue;
+    cursor: pointer;
+}
+
 .options {
     overflow: hidden;
     min-width: 32px;

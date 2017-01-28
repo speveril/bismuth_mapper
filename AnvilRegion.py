@@ -1,9 +1,9 @@
 import sys
 import struct
 import os
+import io
 import gzip
 import zlib
-import cStringIO
 from TagReader import TagReader
 
 class AnvilRegion:
@@ -16,7 +16,7 @@ class AnvilRegion:
             self.read()
 
     def read(self):
-        #print "Loading anvil region " + self.path
+        #print("Loading anvil region " + self.path)
         chunk_info = []
 
         for i in range(0, 1024):
@@ -37,13 +37,13 @@ class AnvilRegion:
             raw_chunk_type = struct.unpack("b", self.file.read(1))[0]
             raw_chunk_data = self.file.read(raw_chunk_size - 1)
 
-            #print "-- CHUNK -- (type:" + str(raw_chunk_type) + "," + str(ch) + ") --"
+            #print("-- CHUNK -- (type:" + str(raw_chunk_type) + "," + str(ch) + ") --")
             if raw_chunk_type > 0:
                 chunk_data = zlib.decompress(raw_chunk_data)
             else:
                 chunk_data = raw_chunk_data
 
-            data_buffer = cStringIO.StringIO(chunk_data)
+            data_buffer = io.BytesIO(chunk_data)
             tagReader = TagReader(data_buffer)
             root = tagReader.readTag()
             self.chunks.append((ch, root))
