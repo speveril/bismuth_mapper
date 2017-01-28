@@ -25,6 +25,7 @@
                 <label for="overlay_icons_toggle"><input type="checkbox" id="overlay_icons_toggle"> Icons</label>
                 <label for="overlay_labels_toggle"><input type="checkbox" id="overlay_labels_toggle"> Labels</label>
                 <label for="show_coord_hint_toggle"><input type="checkbox" id="show_coord_hint_toggle"> Coordinate Tip</label>
+                <label for="show_grid_toggle"><input type="checkbox" id="show_grid_toggle"> Region Grid</label>
             </p>
             <p>
                 <strong>Sign Formats for Markers</strong>
@@ -99,7 +100,7 @@ var options = {
     show_icons: true,
     show_labels: true,
     show_grid: true,
-    show_coord_hint: true
+    show_coord_hint: false
 };
 // TODO config file for title and options header
 
@@ -180,7 +181,31 @@ function redrawMap() {
     }
 
     if (options.show_grid) {
+        let sz = 512 * camera[2];
+        let x = -(camera[0] % 512) * camera[2];
+        let y = -(camera[1] % 512) * camera[2];
 
+        let _lw = ctxO.lineWidth;
+        let _ss = ctxO.strokeStyle;
+        ctxO.lineWidth = Math.max(1, camera[2]);
+        ctxO.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+
+        ctxO.beginPath();
+        while (x < w) {
+            ctxO.moveTo(x, 0);
+            ctxO.lineTo(x, h);
+            x += sz;
+        }
+
+        while (y < h) {
+            ctxO.moveTo(0, y);
+            ctxO.lineTo(w, y);
+            y += sz;
+        }
+        ctxO.stroke();
+
+        ctxO.lineWidth = _lw;
+        ctxO.strokeStyle = _ss;
     }
 
     if (options.show_icons || options.show_labels) {
@@ -227,7 +252,7 @@ function waitForLoad(cb) {
 
 function setupInput() {
     var dragging = false;
-    var lastMousePos = [];
+    var lastMousePos = [0,0];
     var zoomSpeed = 0.5;
 
     $('.input-catcher').on('mousedown', function(evt) {
@@ -310,6 +335,12 @@ function setupOptions() {
         $('.coord-hint').toggle(options.show_coord_hint);
         save();
     });
+
+    options.show_grid ? $('.options #show_grid_toggle').attr('checked','checked') : $('.options #show_grid_toggle').removeAttr('checked');
+    $('.options #show_grid_toggle').on('change', function() {
+        options.show_grid = $('.options #show_grid_toggle').is(":checked");
+        redrawMap();
+    });
 }
 
 // --- loading stuff ---
@@ -359,12 +390,12 @@ function loadedImages() {
         camera = [-$('canvas').width() / 2, -$('canvas').height() / 2, 1];
     }
 
-    setupOptions();
-    setupInput();
-
     $('body').removeClass('loading');
     $(window).on('resize',resizeCanvases);
     resizeCanvases();
+
+    setupOptions();
+    setupInput();
 }
 
 
