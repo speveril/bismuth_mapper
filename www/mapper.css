@@ -5,6 +5,7 @@
 
 body {
     background: #000;
+    overflow: hidden;
 }
 
 body.loading::before {
@@ -31,6 +32,19 @@ body.loading::before {
     -webkit-animation-duration: 1s;
     -webkit-animation-iteration-count: infinite;
     -webkit-animation-timing-function: linear;
+}
+
+.coord-hint {
+    position: absolute;
+    font-family: Calibri;
+    font-size: 8pt;
+    padding: 3px;
+    pointer-events: none;
+    display: none;
+
+    border: 1px solid #000;
+    background: #888;
+    white-space: pre;
 }
 
 canvas, .input-catcher {

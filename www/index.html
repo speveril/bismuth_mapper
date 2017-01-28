@@ -24,6 +24,7 @@
                 <strong>Map Controls</strong><br>
                 <label for="overlay_icons_toggle"><input type="checkbox" id="overlay_icons_toggle"> Icons</label>
                 <label for="overlay_labels_toggle"><input type="checkbox" id="overlay_labels_toggle"> Labels</label>
+                <label for="show_coord_hint_toggle"><input type="checkbox" id="show_coord_hint_toggle"> Coordinate Tip</label>
             </p>
             <p>
                 <strong>Sign Formats for Markers</strong>
@@ -84,6 +85,7 @@
                 </table>
             </p>
         </div>
+        <div class="coord-hint"></div>
     </body>
 
 <script>
@@ -95,7 +97,9 @@ var things_to_load = 0;
 var camera = [0,0,1];
 var options = {
     show_icons: true,
-    show_labels: true
+    show_labels: true,
+    show_grid: true,
+    show_coord_hint: true
 };
 // TODO config file for title and options header
 
@@ -175,6 +179,10 @@ function redrawMap() {
         }
     }
 
+    if (options.show_grid) {
+
+    }
+
     if (options.show_icons || options.show_labels) {
         for (var i = 0; i < tiles.length; i++) {
             var tile = tiles[i]
@@ -238,6 +246,15 @@ function setupInput() {
             camera[1] -= dy / camera[2];
             redrawMap();
         }
+        if (options.show_coord_hint) {
+            let $hint = $('.coord-hint');
+            $hint.css({
+                top: (evt.pageY + 10) + 'px',
+                left: (evt.pageX + 5) + 'px'
+            });
+            $hint.html(((evt.pageX / camera[2]) + camera[0]) + ', ' + ((evt.pageY / camera[2]) + camera[1]));
+        }
+
         lastMousePos = [evt.pageX, evt.pageY];
     });
 
@@ -285,6 +302,14 @@ function setupOptions() {
         options.show_labels = $('.options #overlay_labels_toggle').is(":checked");
         redrawMap();
     });
+
+    options.show_coord_hint ? $('.options #show_coord_hint_toggle').attr('checked','checked') : $('.options #show_coord_hint_toggle').removeAttr('checked');
+    $('.coord-hint').toggle(options.show_coord_hint);
+    $('.options #show_coord_hint_toggle').on('change', function() {
+        options.show_coord_hint = $('.options #show_coord_hint_toggle').is(":checked");
+        $('.coord-hint').toggle(options.show_coord_hint);
+        save();
+    });
 }
 
 // --- loading stuff ---
@@ -323,7 +348,11 @@ function loadedImages() {
             // no-op, fall back on the empty object
         }
         if (saved.camera) { camera = saved.camera; }
-        if (saved.options) { options = saved.options; }
+        if (saved.options) {
+            for (i in saved.options) {
+                options[i] = saved.options[i];
+            }
+        }
     }
 
     if (!document.cookie || !camera || camera.length != 3 || camera[2] < 0.1 || camera[2] > 16) {
