@@ -158,6 +158,6 @@ class TagReader:
 
     def readString(self):
         length = struct.unpack('>h',self.file.read(2))[0]
-        return self.file.read(length)
+        return self.file.read(length).decode('UTF-8')
 
 # -----------------------------------------------------------------------------------------------------------------

@@ -98,7 +98,7 @@ def build(config):
             out(".")
         out("\n")
     else:
-        out("Ignore maps; building full sized combined map")
+        out("Ignore maps; building full sized combined map\n")
 
         region_files = os.listdir(region_path)
         region_files.sort(key=lambda x: int(x.split(".")[1]) + int(x.split(".")[2]) / 10000)
