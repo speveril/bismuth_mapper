@@ -85,7 +85,8 @@ class TileGenerator:
                                         if not bl:
                                             light = 0.50 + (self.get_nibble(sections[sect]['BlockLight'].value, blockIndex) * 0.034)
 
-                                        if bl in [31,32,37,38,39,40,78]:
+                                        # plants, snow layer, and carpet should count as a block lower
+                                        if bl in [31,32,37,38,39,40,78,141,142,171,207]:
                                             h = h - 1
                                         heights[tileX * 512 + tileZ] = h
 
@@ -94,13 +95,18 @@ class TileGenerator:
 
                                 if cl < 0:
                                     dataValue = self.get_nibble(sections[sect]['Data'].value, blockIndex)
-                                    cl = self.colors['tint_colors'][-cl][dataValue]
-                                color = self.colors['actual'][cl]
+                                    try:
+                                        cl = self.colors['tint_colors'][-cl][dataValue]
+                                    except:
+                                        out("\nERROR: Couldn't get tint color " + str(dataValue) + " for block " + str(bl) + "\n")
+                                        exit()
 
                                 if tileZ > 0 and heights[tileX * 512 + (tileZ - 1)] and heights[tileX * 512 + (tileZ - 1)] > h:
                                     color = self.colors['dark'][cl]
                                 elif tileZ > 0 and heights[tileX * 512 + (tileZ - 1)] and heights[tileX * 512 + (tileZ - 1)] < h:
                                     color = self.colors['bright'][cl]
+                                else:
+                                    color = self.colors['actual'][cl]
 
                                 tile_im.putpixel((tileX, tileZ), (int(color[0] * light), int(color[1] * light), int(color[2] * light)))
 
