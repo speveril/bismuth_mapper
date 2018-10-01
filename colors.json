@@ -44,6 +44,58 @@
         [ 32, 32,196,   "(deep water blue)"],
         [255,  0,255,   "(death magenta)"]
     ],
+    "palette": {
+        "transparent":      [255,255,255],
+        "green_grass":      [127,178, 56, "Grass Block, Slime Block"],
+        "tan_sand":         [247,233,163, "Sand, Sandstone, Sandstone Stairs, Sandstone Slab, Chiseled Sandstone, Smooth Sandstone, Glowstone, End Stone, End Stone Bricks"],
+        "lightgray":        [199,199,199, "Bed, Cobweb, All-sided-stem huge mushroom blocks"],
+        "red_lava":         [255,  0,  0, "Lava, TNT, Fire, Block of Redstone"],
+        "blue_ice":         [160,160,255, "Ice, Frosted Ice, Packed Ice"],
+        "gray_iron":        [167,167,167, "Block of Iron, Iron Door, Iron Trapdoor, Iron Bars, Brewing Stand, Anvil, Weighted Pressure Plate (Heavy)"],
+        "green_plant":      [  0,124,  0, "Saplings, Leaves, Tall Grass, Dead Bush, Flowers, Mushrooms, Seeds, Cactus, Sugar Cane, Pumpkin Stem, Melon Stem, Vines, Lily Pad"],
+        "white_wool":       [240,240,240, "Wool (White), Carpet (White), White Stained Clay "],
+        "blue_clay":        [164,168,184, "Clay Block, Monster Eggs"],
+
+        "brown_dirt":       [151,109, 77, "Dirt, Granite, Polished Granite, Farmland, Red Sand, Red Sandstone, Red Sandstone Stairs, Red Sandstone Slab, Chiseled Red Sandstone, Smooth Red Sandstone"],
+        "gray_stone":       [112,112,112, "Stone, Stone Slab, Cobblestone, Cobblestone Stairs, Cobblestone Slab, Cobblestone Wall, Moss Stone, Mossy Cobblestone Wall, Andesite, Polished Andesite, Bedrock, Gold Ore, Iron Ore, Coal Ore, Lapis Lazuli Ore, Dispenser, Dropper, Sticky Piston, Piston, Piston Head, Block moved by Piston, Monster Spawner, Diamond Ore, Furnace, Cobblestone Stairs, Stone Pressure Plate, Redstone Ore, Stone Bricks, Stone Brick Stairs, Stone Bricks Slab, Mossy Stone Bricks, Cracked Stone Bricks, Chiseled Stone Bricks, Ender Chest, Hopper, Gravel, Observer"],
+        "blue_water":       [ 64, 64,255, "water blue"],
+        "brown_oak":        [143,119, 72, "Oak Wood, Oak Wood Planks, Oak Fence, Oak Fence Gate, Oak Wood Stairs, Oak Wood Slab, Note Block, Bookshelf, Chest, Trapped Chest, Crafting Table, Wooden Doors, Sign, Wooden Pressure Plate, Jukebox, Wooden Trapdoor, Huge Brown Mushroom, Banners, Daylight Sensor"],
+        "white_quartz":     [255,252,245, "quartz white"],
+
+        "orange_wool":      [216,127, 51, "Orange Wool, Orange Carpet, Orange Stained Clay, Pumpkin, Jack-O-Lantern, Hardened Clay, Acacia Wood, Acacia Wood Planks, Acacia Fence, Acacia Fence Gate, Acacia Wood Stairs, Acacia Wood Slab"],
+        "magenta_wool":     [178, 76,216, "Magenta Wool, Magenta Carpet, Magenta Stained Clay, Purpur Blocks"],
+        "lightblue_wool":   [102,153,216, "Light Blue Wool, Light Blue Carpet, Light Blue Stained Clay"],
+        "yellow_wool":      [229,229, 51, "Yellow Wool, Yellow Carpet, Yellow Stained Clay, Hay Bale, Sponge, Wet Sponge"],
+        "lime_wool":        [127,204, 25, "Lime Wool, Lime Carpet, Lime Stained Clay, Melon"],
+        "pink_wool":        [242,127,165, "Pink Wool, Pink Carpet, Pink Stained Clay"],
+        "gray_wool":        [ 76, 76, 76, "Gray Wool, Gray Carpet, Gray Stained Clay, Cauldron"],
+        "lightgray_wool":   [153,153,153, "Light Gray Wool, Light Gray Carpet, Light Gray Stained Clay, Structure Block"],
+        "cyan_wool":        [ 76,127,153, "Cyan Wool, Cyan Carpet, Cyan Stained Clay, Prismarine"],
+        "purple_wool":      [127, 63,178, "Purple Wool, Purple Carpet, Purple Stained Clay, Mycelium, Command Block (repeating), Chorus Plant, Chorus Flower"],
+        "blue_wool":        [ 51, 76,178, "Blue Wool, Blue Carpet, Blue Stained Clay"],
+        "brown_wool":       [102, 76, 51, "Brown Wool, Brown Carpet, Brown Stained Clay"],
+        "green_wool":       [102,127, 51, "Green Wool, Green Carpet, Green Stained Clay, End Portal Frame, Command Block (chain)"],
+        "red_wool":         [153, 51, 51, "Red Wool, Red Carpet, Red Stained Clay"],
+        "black_wool":       [ 25, 25, 25, "Black Wool, Black Carpet, Black Stained Clay"],
+
+        "yellow_gold":      [250,238, 77, "Block of Gold, Weighted Pressure Plate (Light)"],
+        "cyan_diamond":     [ 92,219,213, "Block of Diamond, Prismarine Bricks, Dark Prismarine, Beacon"],
+        "blue_lapis":       [ 74,128,255, "Lapis Lazuli Block"],
+        "green_emerald":    [  0,217, 58, "Block of Emerald"],
+        "brown_spruce":     [129, 86, 49, "Podzol, Spruce Wood, Spruce Wood Planks, Spruce Fence, Spruce Fence Gate, Spruce Wood Stairs, Spruce Wood Slab"],
+        "red_netherrack":   [112,  2,  0, "Netherrack, Nether Quartz Ore, Nether Brick, Nether Brick Fence, Nether Brick Stairs, Red Nether Brick, Magma Block"],
+        "blue_deepwater":   [ 32, 32,196, "(deep water blue)"],
+        "magenta_death":    [255,  0,255, "(death magenta)"],
+
+
+        "tan_birch":        [247,233,163, "Birch Wood, Birch Wood Planks, Birch Fence, Birch Fence Gate, Birch Wood Stairs, Birch Wood Slab, Stem and all-sided-inside-textured huge mushroom blocks, Bone Block"],
+        "brown_jungle":     [151,109, 77, "Jungle Wood, Jungle Wood Planks, Jungle Fence, Jungle Fence Gate, Jungle Wood Stairs, Jungle Wood Slab"],
+        "brown_darkoak":    [102, 76, 51, "Soul Sand, Dark Oak Wood, Dark Oak Wood Planks, Dark Oak Fence, Dark Oak Fence Gate, Dark Oak Wood Stairs, Dark Oak Wood Slab, Command Block (impulse)"],
+        "red_brick":        [153, 51, 51, "Huge Red Mushroom, Bricks, Brick Stairs, Bricks Slab, Enchanting Table, Nether Wart, Nether Wart Block"],
+        "black_obsidian":   [ 25, 25, 25, "Dragon Egg, Block of Coal, Obsidian, End Portal (block)"],
+        "green_path":       [156,156, 25, "Grass path"],
+        "white_snow":       [240,240,240, "Snow, Snow block"]
+    },
     "block_comment": "see http://www.minecraftwiki.net/wiki/Block_ids, negative values mean to use a tint; I use slightly different colours for glass and maybe a few other things",
     "block": [
          0, 11,  1, 10, 11, -5,  7, 11, 12, 12,  4,  4, -2, 11, 11, 11,        11, -3,  7, 18,  5, 11, 32, 11,  2, 13,  3,  0,  0, 11,  3,  7,
@@ -56,6 +108,65 @@
         15, 34,  2, 10, 26, 15,  0, 24, 16, 16, 16, 16, 16, 16,  2,  7,         9,  0, 24, 27,  5, 35, 28, 35,  2, 37, 11, -1,  -1, -1, -1, -1,
         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 37, 37, 37, 37, 37,        37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37,  37, 37, 37, 37
     ],
+    "name_block_comment": "see https://minecraft.gamepedia.com/Java_Edition_data_values; 1.13 no longer refers to blocks by an integer id",
+    "name_block": {
+        "grass_block": "green_grass", "grass_path": "green_path",
+        "stone": "gray_stone", "bedrock": "gray_stone",
+        "gold_ore": "gray_stone", "iron_ore": "gray_stone", "coal_ore": "gray_stone",
+        "granite": "gray_stone", "polished_granite": "gray_stone", 
+        "diorite": "gray_stone", "polished_diorite": "gray_stone",
+        "andesite": "gray_stone", "polished_andesite": "gray_stone",
+        "cobblestone": "gray_stone", "cobblestone_stairs": "gray_stone", "cobblestone_slab": "gray_stone", "cobblestone_wall": "gray_stone",
+        "stone_bricks": "gray_stone", "stone_brick_slab": "gray_stone", "chiseled_stone_bricks": "gray_stone",
+
+        "oak_planks": "brown_oak", "oak_log": "brown_oak", "oak_fence": "brown_oak", "oak_fence_gate": "brown_oak", "oak_slab": "brown_oak", "oak_door": "brown_oak", "oak_stairs": "brown_oak",
+        "spruce_planks": "brown_spruce", "spruce_log": "brown_spruce", "spruce_fence": "brown_spruce", "spruce_fence_gate": "brown_spruce", "spruce_slab": "brown_spruce", "spruce_door": "brown_spruce", "spruce_stairs": "brown_spruce",
+        "birch_planks": "tan_birch", "birch_log": "tan_birch", "birch_fence": "tan_birch", "birch_fence_gate": "tan_birch", "birch_slab": "tan_birch", "birch_door": "tan_birch", "birch_stairs": "tan_birch",
+        "jungle_planks": "brown_jungle", "jungle_log": "brown_jungle", "jungle_fence": "brown_jungle", "jungle_fence_gate": "brown_jungle", "jungle_slab": "brown_jungle", "jungle_door": "brown_jungle", "jungle_stairs": "brown_jungle",
+        "acacia_planks": "brown_acacia", "acacia_log": "brown_acacia", "acacia_fence": "brown_acacia", "acacia_fence_gate": "brown_acacia", "acacia_slab": "brown_acacia", "acacia_door": "brown_acacia", "acacia_stairs": "brown_acacia",
+        "dark_oak_planks": "brown_darkoak", "dark_oak_log": "brown_darkoak", "dark_oak_fence": "brown_darkoak", "dark_oak_fence_gate": "brown_darkoak", "dark_oak_slab": "brown_darkoak", "dark_oak_door": "brown_darkoak", "dark_oak_stairs": "brown_darkoak",
+
+        "oak_leaves": "green_plant", "spruce_leaves": "green_plant", "birch_leaves": "green_plant", "jungle_leaves": "green_plant", "dark_oak_leaves": "green_plant",
+
+        "oak_sapling": "green_plant", "spruce_sapling": "green_plant", "birch_sapling": "green_plant", "jungle_sapling": "green_plant", "acacia_sapling": "green_plant", "dark_oak_sapling": "green_plant",
+        "grass": "green_plant", "tall_grass": "green_plant", "sugar_cane": "green_plant", "vine": "green_plant",
+        "sunflower": "green_plant", "lilac": "green_plant", "rose_bush": "green_plant", "peony": "green_plant", "large_fern": "green_plant", "dandelion": "green_plant",
+        "poppy": "green_plant", "blue_orchid": "green_plant", "allium": "green_plant", "azure_bluet": "green_plant", "red_tulip": "green_plant", "orange_tulip": "green_plant", "white_tulip": "green_plant",
+        "pink_tulip": "green_plant", "oxeye_daisy": "green_plant", "fern": "green_plant", "dead_bush": "green_plant",
+        "lily_pad": "green_plant", "seagrass": "green_plant", "tall_seagrass": "green_plant", "kelp": "green_plant",
+        "wheat": "green_plant", "carrots": "green_plant", "beetroots": "green_plant", "potatoes": "green_plant", "pumpkin": "orange_wool",
+        "brown_mushroom": "brown_spruce", "red_mushroom": "red_netherrack",
+
+        "snow": "white_snow", "snow_block": "white_snow", "ice": "blue_ice",
+        "dirt": "brown_dirt", "coarse_dirt": "brown_dirt", 
+        "podzol": "brown_spruce",
+        "sand": "tan_sand", "sandstone": "tan_sand",
+        "red_sand": "brown_dirt",
+        "gravel": "gray_stone",
+
+        "water": "blue_water", "flowing_water": "blue_water",
+        "lava": "red_lava", "flowing_lava": "red_lava", "magma_block": "red_lava", "fire": "red_lava",
+        "slime_block": "green_grass",
+
+        "wall_torch": "red_lava", "torch": "red_lava", "furnace": "gray_stone", "ladder": "brown_oak", "sign": "brown_oak", "wall_sign": "brown_oak",
+
+        "white_wool": "white_wool", "orange_wool": "orange_wool", "magenta_wool": "magenta_wool", "light_blue_wool": "lightblue_wool", "yellow_wool": "yellow_wool",
+        "lime_wool": "lime_wool", "pink_wool": "pink_wool", "gray_wool": "gray_wool", "light_gray_wool": "lightgray_wool", "cyan_wool": "cyan_wool",
+        "purple_wool": "purple_wool", "blue_wool": "blue_wool", "brown_wool": "brown_wool", "green_wool": "green_wool", "red_wool": "red_wool", "black_wool": "black_wool",
+        "white_bed": "white_wool", "orange_bed": "orange_wool", "magenta_bed": "magenta_wool", "light_blue_bed": "lightblue_wool", "yellow_bed": "yellow_wool",
+        "lime_bed": "lime_wool", "pink_bed": "pink_wool", "gray_bed": "gray_wool", "light_gray_bed": "lightgray_wool", "cyan_bed": "cyan_wool",
+        "purple_bed": "purple_wool", "blue_bed": "blue_wool", "brown_bed": "brown_wool", "green_bed": "green_wool", "red_bed": "red_wool", "black_bed": "black_wool",
+        "white_wall_banner": "white_wool", "orange_wall_banner": "orange_wool", "magenta_wall_banner": "magenta_wool", "light_blue_wall_banner": "lightblue_wool", "yellow_wall_banner": "yellow_wool",
+        "lime_wall_banner": "lime_wool", "pink_wall_banner": "pink_wool", "gray_wall_banner": "gray_wool", "light_gray_wall_banner": "lightgray_wool", "cyan_wall_banner": "cyan_wool",
+        "purple_wall_banner": "purple_wool", "blue_wall_banner": "blue_wool", "brown_wall_banner": "brown_wool", "green_wall_banner": "green_wool", "red_wall_banner": "red_wool", "black_wall_banner": "black_wool",
+        "white_banner": "white_wool", "orange_banner": "orange_wool", "magenta_banner": "magenta_wool", "light_blue_banner": "lightblue_wool", "yellow_banner": "yellow_wool",
+        "lime_banner": "lime_wool", "pink_banner": "pink_wool", "gray_banner": "gray_wool", "light_gray_banner": "lightgray_wool", "cyan_banner": "cyan_wool",
+        "purple_banner": "purple_wool", "blue_banner": "blue_wool", "brown_banner": "brown_wool", "green_banner": "green_wool", "red_banner": "red_wool", "black_banner": "black_wool",
+
+        "bubble_column": null,
+
+        "__UNKNOWN__": "magenta_death"
+    },
     "tint_comment": "in the above table, negative values will look up in this table (with the index being the negation of what's in the table)",
     "tint_colors": [
         [],
@@ -66,5 +177,6 @@
         [13,34, 2,10,15,26,0,0,13,34, 2,10,15,26,0,0],
         [11, 2,13,11,28,11,35,14,11, 2,13,11,28,11,35,14]
     ],
-    "water": [ 12, 36 ]
+    "water_old": [ 12, 36 ],
+    "water": [ "blue_water", "blue_deepwater" ]
 }

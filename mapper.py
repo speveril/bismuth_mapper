@@ -3,7 +3,6 @@ import os
 import json
 import re
 import getopt
-from PIL import Image, ImageDraw
 from MCMap import MCMap
 from AnvilRegion import AnvilRegion
 from TileGenerator import TileGenerator
@@ -47,6 +46,9 @@ def make_colors():
     colors = json.load(open('colors.json'))
     colors['dark'] = []
     colors['bright'] = []
+    colors['palette_dark'] = {}
+    colors['palette_bright'] = {}
+
 
     for c in colors['actual']:
         if len(c) < 1: # skip placeholders
@@ -58,6 +60,12 @@ def make_colors():
         colors['dark'].append(d)
         b = (min(255,int(c[0] * 1.2)), min(255,int(c[1] * 1.2)), min(255, int(c[2] * 1.2)))
         colors['bright'].append(b)
+    
+    for k,c in colors['palette'].items():
+        d = (int(c[0] * 0.75), int(c[1] * 0.75), int(c[2] * 0.75))
+        colors['palette_dark'][k] = d
+        b = (min(255,int(c[0] * 1.2)), min(255,int(c[1] * 1.2)), min(255, int(c[2] * 1.2)))
+        colors['palette_bright'][k] = b
 
     return colors
 

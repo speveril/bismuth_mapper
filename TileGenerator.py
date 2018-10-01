@@ -2,6 +2,8 @@ from PIL import Image, ImageDraw
 from AnvilRegion import AnvilRegion
 from output import out
 import json
+import math
+import sys
 
 class TileGenerator:
     def __init__(self, mask_data, colors, minx, minz, maxx, maxz):
@@ -18,7 +20,57 @@ class TileGenerator:
             return byte & 15
         else:
             return (byte & 240) >> 4
+    
+    def get_longarray_bits(self, array, bitindex, numbits, debug=False):
+        arrayindex = int(bitindex / 64)
+        bit = bitindex % 64
 
+        # LongArray uses signed longs, and Python's bitwise operators don't work well with negative numbers,
+        # so convert them to unsigned by adding 2^64 (sigh)
+        lowlong = array[arrayindex]
+        if lowlong < 0:
+            lowlong = lowlong + 2**64
+
+        highlong = 0
+        if (arrayindex < len(array) - 1):
+            highlong = array[arrayindex + 1]
+            if highlong < 0:
+                highlong = highlong + 2**64
+        
+        if debug:
+            out("\n >> width: %d, index: %d, %d %d" % (numbits, bitindex % 64, array[arrayindex + 1] if arrayindex < len(array) - 1 else 0, array[arrayindex]))
+            out("\n  >> %s %s" % ('{:064b}'.format(array[arrayindex + 1] if arrayindex < len(array) - 1 else 0), '{:064b}'.format(array[arrayindex])))
+            out("\n  >> %s %s" % ('{:064b}'.format(highlong), '{:064b}'.format(lowlong)))
+
+        mask = '1' * numbits
+        n = (lowlong >> bit) & int(mask, 2)
+        if bit + numbits > 64:
+            mask = '1' * (bit + numbits - 64)
+            n += (highlong & int(mask, 2)) << (numbits - len(mask))
+        
+        if debug:
+            out("\n  >> %s > %d" % (('{:0%db}' % numbits).format(n), n))
+        return n
+    
+    def isAir(self, blockname):
+        return blockname in ['minecraft:air','minecraft:cave_air','minecraft:void_air']
+    
+    def isWater(self, blockname):
+        return blockname in ['minecraft:water','minecraft:flowing_water']
+    
+    def isFlat(self, blockname):
+        blockname = blockname.replace('minecraft:', '')
+        flatblocks = [
+            'oak_sapling','spruce_sapling','birch_sapling','jungle_sapling','acacia_sapling','dark_oak_sapling','grass',
+            'sunflower','lilac','rose_bush','peony','tall_grass','large_fern','dandelion','poppy','blue_orchid','allium',
+            'azure_bluet','red_tulip','orange_tulip','white_tulip','pink_tulip','oxeye_daisy','fern','dead_bush',
+            'brown_mushroom','red_mushroom','snow','white_carpet','orange_carpet','magenta_carpet','light_blue_carpet',
+            'yellow_carpet','lime_carpet','pink_carpet','gray_carpet','light_gray_carpet','cyan_carpet','wheat','carrots',
+            'potatoes','nether_wart','beetroots'
+        ]
+        return blockname in flatblocks
+
+    
     def makeTile(self, region):
         tile_im = Image.new("RGBA", (512,512), color=(0,0,0,0))
         markers = []
@@ -37,9 +89,9 @@ class TileGenerator:
                 worldX = data['xPos'].value * 16
                 worldZ = data['zPos'].value * 16
 
-                if 'Sections' in data.value and 'HeightMap' in data.value:
+                if 'Sections' in data.value:
                     sections = [None] * 16
-                    for s in data['Sections'].value:
+                    for s in data.value['Sections'].value:
                         sections[s['Y'].value] = s
 
                     for x in range(16):
@@ -50,28 +102,47 @@ class TileGenerator:
                             tileZ = (worldZ % 512) + z
 
                             if mapX >= 0 and mapX < self.combined_width and mapY >= 0 and mapY < self.combined_height and (self.mask_data == None or self.mask_data[mapX + (mapY * self.combined_width)] != 0):
-                                h = data['HeightMap'].value[x + z * 16] + 2
-                                cl = 0
+                                h = 256
+
+                                # TODO should be able to make it run faster using Heightmaps but... this doesn't seem to work
+                                # if 'WORLD_SURFACE' in data['Heightmaps'].value:
+                                #     h = data['Heightmaps']['WORLD_SURFACE'][x + z * 16] or 256
+                                # if h == 256 and 'WORLD_SURFACE_WG' in data['Heightmaps'].value:
+                                #     h = data['Heightmaps']['WORLD_SURFACE_WG'][x + z * 16] or 256 # _WG is the World Generation value of the heightmap
+                                # h = min(256, h + 2)
+                                
+                                cl = None
                                 water_depth = 0
                                 light = 0.5
 
-                                while (cl == 0 or water_depth > 0) and h >= 0:
+                                while (cl == None or water_depth > 0) and h >= 0:
                                     h = h - 1
-                                    sect = int(h/16)
+                                    sect = int(h / 16)
                                     if sections[sect]:
-                                        blockIndex = x + z * 16 + (h % 16) * 256
+                                        pal = sections[sect]['Palette'].value
 
-                                        bl = sections[sect]['Blocks'].value[blockIndex]
-
-                                        if sections[sect]['Add'] != None:
-                                            addValue = self.get_nibble(sections[sect]['Add'].value, blockIndex)
-                                            bl = bl + (addValue << 8)
-
-                                        if bl == 8 or bl == 9: # water handling
-                                            water_depth += 1
-                                        elif bl == 10 or bl == 11: # lava handling
-                                            cl = self.colors['block'][bl]
+                                        indexbitsize = max(4, math.ceil(math.log(max(len(pal), 1), 2)))
+                                        bitindex = (x + z * 16 + (h % 16) * 256) * indexbitsize
+                                        blockIndex = self.get_longarray_bits(sections[sect]['BlockStates'].value, bitindex, indexbitsize)
+                                        if blockIndex >= len(pal):
+                                            out(" >> (%d, %d, %d), bad block index; %s" % (x, z, h, bin(len(pal))))
+                                            self.get_longarray_bits(sections[sect]['BlockStates'].value, bitindex, indexbitsize, True)
+                                            out("\n!! block index (%s) out of range (%s) -- %s(bit %s, %s size) !!\n" % (blockIndex, len(pal), bitindex, (bitindex % 64), indexbitsize))
+                                            cl = self.colors['name_block']['__UNKNOWN__']
                                             light = 1
+                                            break
+
+                                        bl = pal[blockIndex]['Name'].value
+
+                                        if self.isAir(bl):
+                                            # TODO fix lighting
+                                            light = 0.50 + (self.get_nibble(sections[sect]['BlockLight'].value, (x + z * 16 + (h % 16) * 256)) * 0.034)
+                                            continue
+                                        elif self.isWater(bl):
+                                            water_depth += 1
+                                        # elif self.isLava(bl):
+                                        #     cl = self.colors['name_block']['lava']
+                                        #     light = 1
                                         else:
                                             if water_depth > 0:
                                                 if water_depth < 12 or (water_depth < 24 and (mapX + mapY) % 2):
@@ -80,34 +151,47 @@ class TileGenerator:
                                                     cl = self.colors['water'][1]
                                                 water_depth = 0
                                             else:
-                                                cl = self.colors['block'][bl]
-
-                                        if not bl:
-                                            light = 0.50 + (self.get_nibble(sections[sect]['BlockLight'].value, blockIndex) * 0.034)
+                                                if bl.replace('minecraft:','') in self.colors['name_block']:
+                                                    cl = self.colors['name_block'][bl.replace('minecraft:','')]
+                                                else:
+                                                    out("!! unrecognized block type %s\n" % (bl))
+                                                    cl = self.colors['name_block']['__UNKNOWN__']
+                                                    light = 1
 
                                         # plants, snow layer, and carpet should count as a block lower
-                                        if bl in [31,32,37,38,39,40,78,141,142,171,207]:
+                                        if self.isFlat(bl):
                                             h = h - 1
                                         heights[tileX * 512 + tileZ] = h
 
-                                    if h == 0 and cl == 0:
-                                        out("!!" + str(x) + "," + str(z) + "!!")
+                                    if h < 0:
+                                        # out("!!" + str(x) + "," + str(z) + "!!")
+                                        pass
+                                
+                                if cl == None:
+                                    continue
 
-                                if cl < 0:
-                                    dataValue = self.get_nibble(sections[sect]['Data'].value, blockIndex)
-                                    try:
-                                        cl = self.colors['tint_colors'][-cl][dataValue]
-                                    except:
-                                        out("\nERROR: Couldn't get tint color " + str(dataValue) + " for block " + str(bl) + "\n")
-                                        exit()
+                                # if cl < 0:
+                                #     dataValue = self.get_nibble(sections[sect]['Data'].value, blockIndex)
+                                #     try:
+                                #         cl = self.colors['tint_colors'][-cl][dataValue]
+                                #     except:
+                                #         out("\nERROR: Couldn't get tint color " + str(dataValue) + " for block " + str(bl) + "\n")
+                                #         exit()
 
                                 if tileZ > 0 and heights[tileX * 512 + (tileZ - 1)] and heights[tileX * 512 + (tileZ - 1)] > h:
-                                    color = self.colors['dark'][cl]
+                                    color = self.colors['palette_dark'][cl]
                                 elif tileZ > 0 and heights[tileX * 512 + (tileZ - 1)] and heights[tileX * 512 + (tileZ - 1)] < h:
-                                    color = self.colors['bright'][cl]
+                                    color = self.colors['palette_bright'][cl]
                                 else:
-                                    color = self.colors['actual'][cl]
+                                    color = self.colors['palette'][cl]
 
+                                # TODO configurable "fog" at the edges of the map
+                                # if data['Status'].value != 'postprocessed':
+                                #     if data['Status'].value in ['decorated', 'lighted', 'mobs_spawned', 'finalized', 'fullchunk']:
+                                #         if (mapX + mapY) % 2:
+                                #             continue
+                                #     elif mapX % 2 != 0 or mapY % 2 != 0:
+                                #         continue
                                 tile_im.putpixel((tileX, tileZ), (int(color[0] * light), int(color[1] * light), int(color[2] * light)))
 
                 if 'TileEntities' in data.value and len(data['TileEntities'].value) > 0:
@@ -157,4 +241,5 @@ class TileGenerator:
 
                                 if markertype != None:
                                     markers.append({"x": e["x"].value, "z": e["z"].value, "type": markertype, "label": label })
+
         return (tile_im, markers)
