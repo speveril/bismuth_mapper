@@ -6,7 +6,8 @@ import math
 import sys
 
 class TileGenerator:
-    def __init__(self, mask_data, colors, minx, minz, maxx, maxz):
+    def __init__(self, config, mask_data, colors, minx, minz, maxx, maxz):
+        self.config = config
         self.mask_data = mask_data
         self.world_offset = (minx, minz)
         self.combined_width = maxx - minx
@@ -85,6 +86,8 @@ class TileGenerator:
 
             if ch[1] and isinstance(ch[1].value, dict) and ch[1].value and 'Level' in ch[1].value:
                 data = ch[1]['Level']
+                if self.config['fog'] and data['Status'].value in ['empty','base','carved','liquid_carved']:
+                    continue
 
                 worldX = data['xPos'].value * 16
                 worldZ = data['zPos'].value * 16
@@ -170,14 +173,6 @@ class TileGenerator:
                                 if cl == None:
                                     continue
 
-                                # if cl < 0:
-                                #     dataValue = self.get_nibble(sections[sect]['Data'].value, blockIndex)
-                                #     try:
-                                #         cl = self.colors['tint_colors'][-cl][dataValue]
-                                #     except:
-                                #         out("\nERROR: Couldn't get tint color " + str(dataValue) + " for block " + str(bl) + "\n")
-                                #         exit()
-
                                 if tileZ > 0 and heights[tileX * 512 + (tileZ - 1)] and heights[tileX * 512 + (tileZ - 1)] > h:
                                     color = self.colors['palette_dark'][cl]
                                 elif tileZ > 0 and heights[tileX * 512 + (tileZ - 1)] and heights[tileX * 512 + (tileZ - 1)] < h:
@@ -185,13 +180,10 @@ class TileGenerator:
                                 else:
                                     color = self.colors['palette'][cl]
 
-                                # TODO configurable "fog" at the edges of the map
-                                # if data['Status'].value != 'postprocessed':
-                                #     if data['Status'].value in ['decorated', 'lighted', 'mobs_spawned', 'finalized', 'fullchunk']:
-                                #         if (mapX + mapY) % 2:
-                                #             continue
-                                #     elif mapX % 2 != 0 or mapY % 2 != 0:
-                                #         continue
+                                if self.config['fog'] and data['Status'].value != 'postprocessed':
+                                    if data['Status'].value in ['decorated', 'lighted', 'mobs_spawned', 'finalized', 'fullchunk']:
+                                        if (mapX + mapY) % 2:
+                                            continue
                                 tile_im.putpixel((tileX, tileZ), (int(color[0] * light), int(color[1] * light), int(color[2] * light)))
 
                 if 'TileEntities' in data.value and len(data['TileEntities'].value) > 0:

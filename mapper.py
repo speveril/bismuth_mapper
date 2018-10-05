@@ -2,7 +2,7 @@ import sys
 import os
 import json
 import re
-import getopt
+import argparse
 from MCMap import MCMap
 from AnvilRegion import AnvilRegion
 from TileGenerator import TileGenerator
@@ -162,7 +162,7 @@ def build(config):
     region_files.sort(key=lambda x: int(x.split(".")[1]) + int(x.split(".")[2]) / 10000)
     out("Region files sorted.\n")
 
-    tile_generator = TileGenerator(map_data, make_colors(), min_x, min_z, max_x, max_z)
+    tile_generator = TileGenerator(config, map_data, make_colors(), min_x, min_z, max_x, max_z)
 
     for f in region_files:
         out("  " + f + ": ")
@@ -205,7 +205,8 @@ if __name__ == "__main__":
         'worldpath': None,
         'outputpath': None,
         'usemask': False,
-        'forcebuild': False
+        'forcebuild': False,
+        'fog': False
     }
 
     try:
@@ -222,21 +223,29 @@ if __name__ == "__main__":
     except:
         pass
 
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], "w:o:mf", ['--worldpath=', '--outputpath=','--usemask','--forcebuild'])
-    except getopt.GetoptError as e:
-        print(e)
-        sys.exit()
+    # opts, args = getopt.getopt(sys.argv[1:], "w:o:mf", ['--worldpath=', '--outputpath=', '--usemask', '--forcebuild', '--fog'])
+    parser = argparse.ArgumentParser(description="Map a Minecraft world.")
+    parser.add_argument('-w', '--worldpath', type=str, metavar='PATH', required=True, help="Path to the world data.")
+    parser.add_argument('-o', '--out', type=str, metavar='PATH', required=True, help="Path to output the map tiles and JSON.")
+    parser.add_argument('-f', '--forcebuild', action='store_const', const=True, help="Re-build the file even if the existing file is newer than the source.")
+    parser.add_argument('-m', '--usemask', action='store_const', const=True, help="Clip the output based on the in-game map objects that have been created.")
+    parser.add_argument('-g', '--fog', action='store_const', const=True, help="Add a 'fog' effect at the edges of the map where chunks are not fully generated.")
+    opts = parser.parse_args()
 
-    for opt, arg in opts:
-        if opt in ('-w', '--worldpath'):
+    for opt, arg in vars(opts).items():
+        if arg == None:
+            continue
+        
+        if opt in ('worldpath'):
             config['worldpath'] = arg
-        elif opt in ('-o', '--out'):
+        elif opt in ('out'):
             config['outputpath'] = arg
-        elif opt in ('-m', '--usemask'):
+        elif opt in ('usemask'):
             config['usemask'] = True
-        elif opt in ('-f', '--forcebuild'):
+        elif opt in ('forcebuild'):
             config['forcebuild'] = True
+        elif opt in ('fog'):
+            config['fog'] = True
 
     if config['worldpath'] == None or config['outputpath'] == None:
         print("You need to supply at least --worldpath and --outputpath.\n")
