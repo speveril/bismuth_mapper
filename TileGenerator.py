@@ -138,14 +138,10 @@ class TileGenerator:
                                         bl = pal[blockIndex]['Name'].value
 
                                         if self.isAir(bl):
-                                            # TODO fix lighting
                                             light = 0.50 + (self.get_nibble(sections[sect]['BlockLight'].value, (x + z * 16 + (h % 16) * 256)) * 0.034)
                                             continue
                                         elif self.isWater(bl):
                                             water_depth += 1
-                                        # elif self.isLava(bl):
-                                        #     cl = self.colors['name_block']['lava']
-                                        #     light = 1
                                         else:
                                             if water_depth > 0:
                                                 if water_depth < 12 or (water_depth < 24 and (mapX + mapY) % 2):
