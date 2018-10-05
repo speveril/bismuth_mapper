@@ -225,8 +225,8 @@ if __name__ == "__main__":
 
     # opts, args = getopt.getopt(sys.argv[1:], "w:o:mf", ['--worldpath=', '--outputpath=', '--usemask', '--forcebuild', '--fog'])
     parser = argparse.ArgumentParser(description="Map a Minecraft world.")
-    parser.add_argument('-w', '--worldpath', type=str, metavar='PATH', required=True, help="Path to the world data.")
-    parser.add_argument('-o', '--out', type=str, metavar='PATH', required=True, help="Path to output the map tiles and JSON.")
+    parser.add_argument('-w', '--worldpath', type=str, metavar='PATH', help="Path to the world data.")
+    parser.add_argument('-o', '--out', type=str, metavar='PATH', help="Path to output the map tiles and JSON.")
     parser.add_argument('-f', '--forcebuild', action='store_const', const=True, help="Re-build the file even if the existing file is newer than the source.")
     parser.add_argument('-m', '--usemask', action='store_const', const=True, help="Clip the output based on the in-game map objects that have been created.")
     parser.add_argument('-g', '--fog', action='store_const', const=True, help="Add a 'fog' effect at the edges of the map where chunks are not fully generated.")
