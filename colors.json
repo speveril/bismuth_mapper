@@ -135,7 +135,7 @@
         "pink_tulip": "green_plant", "oxeye_daisy": "green_plant", "fern": "green_plant", "dead_bush": "green_plant",
         "lily_pad": "green_plant", "seagrass": "green_plant", "tall_seagrass": "green_plant", "kelp": "green_plant",
         "wheat": "green_plant", "carrots": "green_plant", "beetroots": "green_plant", "potatoes": "green_plant", "pumpkin": "orange_wool",
-        "brown_mushroom": "brown_spruce", "red_mushroom": "red_netherrack",
+        "brown_mushroom": "brown_spruce", "brown_mushroom_block": "brown_spruce", "red_mushroom": "red_netherrack", "red_mushroom_block": "red_netherrack",
 
         "snow": "white_snow", "snow_block": "white_snow", "ice": "blue_ice",
         "dirt": "brown_dirt", "coarse_dirt": "brown_dirt", 
@@ -149,6 +149,7 @@
         "slime_block": "green_grass",
 
         "wall_torch": "red_lava", "torch": "red_lava", "furnace": "gray_stone", "ladder": "brown_oak", "sign": "brown_oak", "wall_sign": "brown_oak",
+        "chest": "brown_oak", "crafting_table": "brown_oak",
 
         "white_wool": "white_wool", "orange_wool": "orange_wool", "magenta_wool": "magenta_wool", "light_blue_wool": "lightblue_wool", "yellow_wool": "yellow_wool",
         "lime_wool": "lime_wool", "pink_wool": "pink_wool", "gray_wool": "gray_wool", "light_gray_wool": "lightgray_wool", "cyan_wool": "cyan_wool",
