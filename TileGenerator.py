@@ -54,7 +54,7 @@ class TileGenerator:
         return n
     
     def isAir(self, blockname):
-        return blockname in ['minecraft:air','minecraft:cave_air','minecraft:void_air']
+        return blockname in ['minecraft:air','minecraft:cave_air','minecraft:void_air','minecraft:ladder']
     
     def isWater(self, blockname):
         return blockname in ['minecraft:water','minecraft:flowing_water']
