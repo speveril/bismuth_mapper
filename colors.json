@@ -199,6 +199,12 @@
         "white_stained_glass_pane": "white_wool", "orange_stained_glass_pane": "orange_wool", "magenta_stained_glass_pane": "magenta_wool", "light_blue_stained_glass_pane": "lightblue_wool", "yellow_stained_glass_pane": "yellow_wool",
         "lime_stained_glass_pane": "lime_wool", "pink_stained_glass_pane": "pink_wool", "gray_stained_glass_pane": "gray_wool", "light_gray_stained_glass_pane": "lightgray_wool", "cyan_stained_glass_pane": "cyan_wool",
         "purple_stained_glass_pane": "purple_wool", "blue_stained_glass_pane": "blue_wool", "brown_stained_glass_pane": "brown_wool", "green_stained_glass_pane": "green_wool", "red_stained_glass_pane": "red_wool", "black_stained_glass_pane": "black_wool",
+        "white_concrete": "white_wool", "orange_concrete": "orange_wool", "magenta_concrete": "magenta_wool", "light_blue_concrete": "lightblue_wool", "yellow_concrete": "yellow_wool",
+        "lime_concrete": "lime_wool", "pink_concrete": "pink_wool", "gray_concrete": "gray_wool", "light_gray_concrete": "lightgray_wool", "cyan_concrete": "cyan_wool",
+        "purple_concrete": "purple_wool", "blue_concrete": "blue_wool", "brown_concrete": "brown_wool", "green_concrete": "green_wool", "red_concrete": "red_wool", "black_concrete": "black_wool",
+        "white_concrete_powder": "white_wool", "orange_concrete_powder": "orange_wool", "magenta_concrete_powder": "magenta_wool", "light_blue_concrete_powder": "lightblue_wool", "yellow_concrete_powder": "yellow_wool",
+        "lime_concrete_powder": "lime_wool", "pink_concrete_powder": "pink_wool", "gray_concrete_powder": "gray_wool", "light_gray_concrete_powder": "lightgray_wool", "cyan_concrete_powder": "cyan_wool",
+        "purple_concrete_powder": "purple_wool", "blue_concrete_powder": "blue_wool", "brown_concrete_powder": "brown_wool", "green_concrete_powder": "green_wool", "red_concrete_powder": "red_wool", "black_concrete_powder": "black_wool",
 
         "tube_coral": "blue_wool", "brain_coral": "pink_wool", "bubble_coral": "purple_wool", "fire_coral": "red_wool", "horn_coral": "yellow_wool",
         "tube_coral_fan": "blue_wool", "brain_coral_fan": "pink_wool", "bubble_coral_fan": "purple_wool", "fire_coral_fan": "red_wool", "horn_coral_fan": "yellow_wool",
