@@ -171,6 +171,7 @@
 
         "wall_torch": "red_lava", "torch": "red_lava", "furnace": "gray_stone", "ladder": "brown_oak", "sign": "brown_oak", "wall_sign": "brown_oak",
         "chest": "brown_oak", "crafting_table": "brown_oak", "jukebox": "brown_oak", "cauldron": "gray_iron", "glass": "lightgray", "glass_pane": "lightgray",
+        "jack_o_lantern": "orange_wool",
 
         "white_wool": "white_wool", "orange_wool": "orange_wool", "magenta_wool": "magenta_wool", "light_blue_wool": "lightblue_wool", "yellow_wool": "yellow_wool",
         "lime_wool": "lime_wool", "pink_wool": "pink_wool", "gray_wool": "gray_wool", "light_gray_wool": "lightgray_wool", "cyan_wool": "cyan_wool",
